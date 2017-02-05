@@ -13,11 +13,11 @@ class TermExtract {
    * Calicurate LR of word.
    * @return Object
    */
-  getImpWord(terms = '') {
-    if (terms === '') {
+  getImpWord(sentence = '') {
+    if (sentence === '') {
       return []
     }
-    return this.calcImp.impotance(terms)
+    return this.calcImp.impotance(sentence)
   }
 }
 

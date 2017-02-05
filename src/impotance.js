@@ -8,12 +8,12 @@ export class CalcImpotance {
   /**
    * @return Object
    */
-  impotance(terms) {
-    if (terms !== String) {
+  impotance(sentence) {
+    if (sentence !== String) {
       throw new TypeError(`Must be an instance of String`)
     }
 
-    const cmpNounList = this.frequency.nounFrequency(terms)
+    const cmpNounList = this.frequency.nounFrequency(sentence)
 
     return cmpNounList
   }
