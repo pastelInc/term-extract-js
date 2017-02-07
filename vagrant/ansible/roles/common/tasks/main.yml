@@ -1,0 +1,15 @@
+---
+- name: upgrade all packages
+  yum: name=* state=latest
+
+- name: add users
+  user:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  with_items: "{{ users }}"
+
+- name: disable selinux
+  yum: name=libselinux-python state=latest
+
+- selinux:
+    state: disabled

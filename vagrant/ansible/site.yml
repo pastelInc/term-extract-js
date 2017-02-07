@@ -1,0 +1,10 @@
+---
+- hosts: playground
+  connection: local
+  become: yes
+  roles:
+    - common
+    - bobbyrenwick.pip
+    - dochang.docker
+  vars_files:
+    - vars/playground.yml

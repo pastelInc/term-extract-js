@@ -1,0 +1,5 @@
+---
+users:
+  - { name: 'vagrant', state: 'present' }
+docker_users:
+  - vagrant
