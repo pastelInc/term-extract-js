@@ -1,18 +1,21 @@
 import MeCab from 'mecab-async'
+import Enum from './enum'
 
 // use Docker
 MeCab.command = 'docker run -i -a STDIN -a STDOUT --rm tsutomu7/mecab'
 
 const meCab = new MeCab()
+const FREQUENCY = Enum('NONE', 'FREQUENCY', 'TERM_FREQUENCY')
 
 class MeCabFrequency {
   constructor() {
     this.agglutinativeLang = true
+    this.frequency = FREQUENCY.FREQUENCY
   }
 
   nounFrequency(sentence) {
     const lines = this.parse(sentence)
-    let cmpNounList = {}
+    let cmpNounList = new Map()
     let terms = []
     let must = false
 
@@ -57,12 +60,12 @@ class MeCabFrequency {
             || end.match(/^\s+$/) || must) {
           terms.pop()
         }
-        const cmpNoun = terms.join(' ')
+        const key = terms.join(' ')
 
-        if (cmpNounList[cmpNoun]) {
-          cmpNounList[cmpNoun]++
+        if (cmpNounList.has(key)) {
+          cmpNounList.set(key, cmpNounList.get(key) + 1)
         } else {
-          cmpNounList[cmpNoun] = 1
+          cmpNounList.set(key, 1)
         }
         terms = []
       }
@@ -119,6 +122,18 @@ class MeCabFrequency {
 
     cmpNounList[cmpNoun]++
     terms = []
+  }
+
+  isNone() {
+    return this.frequency === FREQUENCY.NONE
+  }
+
+  isFrequency() {
+    return this.frequency === FREQUENCY.FREQUENCY
+  }
+
+  isTermFrequency() {
+    return this.frequency === FREQUENCY.TERM_FREQUENCY
   }
 }
 

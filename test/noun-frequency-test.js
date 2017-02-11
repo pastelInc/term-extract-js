@@ -16,14 +16,16 @@ test('single noun should be true', t => {
 })
 
 test('should find noun frequency', t => {
-  const sentence = '水瀬伊織（みなせ いおり）は、バンダイナムコゲームスのゲーム『アイドルマスター』の登場人物で、765プロダクション所属アイドル候補生の一人である。'
+  const sentence = `水瀬伊織（みなせ いおり）は、バンダイナムコゲームスのゲーム『アイドルマスター』の登場人物で、765プロダクション所属アイドル候補生の一人である。`
+  const expected = [
+    ['水瀬伊織', 1],
+    ['バンダイナムコゲームス', 1],
+    ['ゲーム', 1],
+    ['アイドルマスター', 1],
+    ['の登場人物', 1],
+    ['765プロダクション 所属 アイドル 候補生', 1]
+  ]
+  const nounFrequency = [...t.context.meCab.nounFrequency(sentence)]
 
-  t.deepEqual(t.context.meCab.nounFrequency(sentence), {
-    '水瀬伊織': 1,
-    'バンダイナムコゲームス': 1,
-    'ゲーム': 1,
-    'アイドルマスター': 1,
-    'の登場人物': 1,
-    '765プロダクション 所属 アイドル 候補生': 1
-  })
+  t.deepEqual(nounFrequency, expected)
 })
