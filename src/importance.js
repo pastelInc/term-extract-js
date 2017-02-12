@@ -197,7 +197,7 @@ export class HashFrqImportance extends CalcImportance {
     super()
   }
 
-  nounFrequency(sentence) {
+  nounImportance(sentence) {
     const nounFrequency = this.frequency.nounFrequency(sentence)
     const nImp = new Map()
 
