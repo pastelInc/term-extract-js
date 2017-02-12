@@ -2,14 +2,18 @@ import MeCabFrequency from './noun-frequency'
 import Enum from './enum'
 
 const MAX_CMP_SIZE = 1024
-const LR = Enum('NONE', 'TOTAL', 'UNIQUE', 'PERPLEXITY')
+// Compound word weight
+const WEIGHT = Enum('NONE', 'TOTAL', 'UNIQUE', 'PERPLEXITY')
+// How to calculate importance
+const CALC_IMPORTANCE = Enum('NONE', 'FREQUENCY', 'TERM_FREQUENCY')
 
 export class CalcImpotance {
   constructor() {
     this.averageRate = 1
     this.frequency = this.getNounFrequency()
     this.ignoreWords = []
-    this.lr = LR.TOTAL
+    this.weight = WEIGHT.TOTAL
+    this.calcImp = CALC_IMPORTANCE.FREQUENCY
   }
 
   /**
@@ -49,6 +53,9 @@ export class CalcImpotance {
     return nImpDesc
   }
 
+  /**
+   * @return String
+   */
   agglutinativeLang(data) {
     if (typeof data !== 'string') {
       throw new TypeError(`Must be an instance of String`)
@@ -66,6 +73,9 @@ export class CalcImpotance {
     return disp
   }
 
+  /**
+   * @return Map
+   */
   nounImpotance(sentence) {
     if (typeof sentence !== 'string') {
       throw new TypeError(`Must be an instance of String`)
@@ -115,11 +125,11 @@ export class HashImpotance extends CalcImpotance {
           comb.set(combKey, frequency)
         }
 
-        if (this.lr === LR.TOTAL) {
+        if (this.weight === WEIGHT.TOTAL) {
           stat.set(nouns[i], [stat.get(nouns[i])[0] + frequency, stat.get(nouns[i])[1]])
           stat.set(nouns[i + 1], [stat.get(nouns[i + 1])[0], stat.get(nouns[i + 1])[1] + frequency])
         }
-        else if (this.lr === LR.UNIQUE && firstComb) {
+        else if (this.weight === WEIGHT.UNIQUE && firstComb) {
           stat.set(nouns[i], [stat.get(nouns[i])[0] + 1, stat.get(nouns[i])[1]])
           stat.set(nouns[i + 1], [stat.get(nouns[i + 1])[0], stat.get(nouns[i + 1])[1] + 1])
         }
@@ -131,7 +141,7 @@ export class HashImpotance extends CalcImpotance {
   nounFrequency(sentence) {
     let nCont = this.frequency.nounFrequency(sentence)
 
-    if (! (this.frequency.isNone() || this.frequency.isFrequency())) {
+    if (this.calcImp === CALC_IMPORTANCE.TERM_FREQUENCY) {
       const hashTFImpotance = new HashTFImpotance()
 
       nCont = hashTFImpotance.nounImpotance(sentence)
@@ -140,13 +150,13 @@ export class HashImpotance extends CalcImpotance {
   }
 
   nounImpotance(sentence) {
-    const nounFrequency = this.nounFrequency(sentence)
+    const cmpNounFrq = this.nounFrequency(sentence)
     const stat = this.contiguousStatistics(sentence)
     const nImp = new Map()
     let imp = 1
     let count = 0
 
-    for (let cmpNoun of nounFrequency.keys()) {
+    for (let cmpNoun of cmpNounFrq.keys()) {
       if (cmpNoun.match(/^\s*$/)) continue
       if (cmpNoun.length > MAX_CMP_SIZE) continue
       for (let noun of cmpNoun.split(/\s+/)) {
@@ -165,8 +175,8 @@ export class HashImpotance extends CalcImpotance {
       }
       if (count === 0) count = 1
       imp = Math.pow(imp, (1 / (2 * this.averageRate * count)))
-      if (! this.frequency.isNone()) {
-        imp *= nounFrequency.get(cmpNoun)
+      if (this.calcImp !== CALC_IMPORTANCE.NONE) {
+        imp *= cmpNounFrq.get(cmpNoun)
       }
       nImp.set(cmpNoun, imp)
       imp = 1
@@ -182,9 +192,21 @@ export class HashPerplexityImpotance extends CalcImpotance {
   }
 }
 
-export class HashFreqImpotance extends CalcImpotance {
+export class HashFrqImpotance extends CalcImpotance {
   constructor() {
     super()
+  }
+
+  nounFrequency(sentence) {
+    const nounFrequency = this.frequency.nounFrequency(sentence)
+    const nImp = new Map()
+
+    for (let [cmpNoun, frequency] of nounFrequency) {
+      if (cmpNoun.match(/^\s*$/)) continue
+      if (cmpNoun.length > MAX_CMP_SIZE) continue
+      nImp.set(cmpNoun, frequency)
+    }
+    return nImp
   }
 }
 
@@ -214,13 +236,14 @@ export class HashTFImpotance extends CalcImpotance {
   nounImpotance(sentence) {
     const termFrqData = this.termFrequency(sentence)
     const nImp = this.frequency.nounFrequency(sentence)
+    const maxNumOfSimpleNouns = Math.max.apply(null, [...termFrqData.keys()])
 
-    for (let i = 2; i <= Math.max.apply(null, [...termFrqData.keys()]); i++) {
+    for (let i = 2; i <= maxNumOfSimpleNouns; i++) {
       if (! termFrqData.has(i - 1)) continue
       for (let noun1 of termFrqData.get(i - 1)) {
         const nouns1 = noun1.split(/\s+/)
 
-        for (let j = i; j <= Math.max.apply(null, [...termFrqData.keys()]); j++) {
+        for (let j = i; j <= maxNumOfSimpleNouns; j++) {
           if (! termFrqData.has(j)) continue
           for (let noun2 of termFrqData.get(j)) {
             const nouns2 = noun2.split(/\s+/)
