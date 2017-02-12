@@ -1,10 +1,10 @@
-import { CalcImpotance } from './impotance'
+import { CalcImportance } from './importance'
 
 class TermExtract {
 
   constructor(calcImp) {
-    if (! (calcImp instanceof CalcImpotance)) {
-      throw new TypeError(`Must be an instance of CalcImpotance`)
+    if (! (calcImp instanceof CalcImportance)) {
+      throw new TypeError(`Must be an instance of CalcImportance`)
     }
     this.calcImp = calcImp
   }
@@ -17,7 +17,7 @@ class TermExtract {
     if (sentence === '') {
       return []
     }
-    return this.calcImp.impotance(sentence)
+    return this.calcImp.importance(sentence)
   }
 }
 

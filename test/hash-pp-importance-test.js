@@ -1,11 +1,11 @@
 import test from 'ava'
-import { HashFrqImpotance } from '../src/impotance'
+import { HashPerplexityImportance } from '../src/importance'
 
 test.beforeEach(t => {
-  t.context.imp = new HashFrqImpotance()
+  t.context.imp = new HashPerplexityImportance()
 })
 
-test('should be sorted by nouns impotance desc', t => {
+test('should be sorted by nouns importance desc', t => {
   const nImp = new Map([
     ['水瀬伊織', 1.2],
     ['バンダイナムコゲームス', 1],
@@ -26,20 +26,6 @@ test('should be sorted by nouns impotance desc', t => {
   t.deepEqual(Array.from(t.context.imp.nounsImpDesc(nImp)), expected)
 })
 
-test('calicurate importance of word by temporary hash on frequency', t => {
-  const sentence = `水瀬伊織（みなせ いおり）は、バンダイナムコゲームスのゲーム『アイドルマスター』の登場人物で、765プロダクション所属アイドル候補生の一人である。`
-  const expected = [
-    ['水瀬伊織', 1],
-    ['バンダイナムコゲームス', 1],
-    ['ゲーム', 1],
-    ['アイドルマスター', 1],
-    ['の登場人物', 1],
-    ['765プロダクション 所属 アイドル 候補生', 1]
-  ]
-
-  t.deepEqual(Array.from(t.context.imp.nounImpotance(sentence)), expected)
-})
-
 test('return sorted list by importance', t => {
   const sentence = `水瀬伊織（みなせ いおり）は、バンダイナムコゲームスのゲーム『アイドルマスター』の登場人物で、765プロダクション所属アイドル候補生の一人である。`
   const expected = [
@@ -51,5 +37,5 @@ test('return sorted list by importance', t => {
     ['765プロダクション所属アイドル候補生', 1]
   ]
 
-  t.deepEqual(Array.from(t.context.imp.impotance(sentence)), expected)
+  t.deepEqual(Array.from(t.context.imp.importance(sentence)), expected)
 })

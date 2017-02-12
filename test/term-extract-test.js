@@ -1,18 +1,18 @@
 import test from 'ava'
 import TermExtract from '../src/term-extract'
-import { CalcImpotance } from '../src/impotance'
+import { CalcImportance } from '../src/importance'
 
-class MockImpotance extends CalcImpotance {
+class MockImportance extends CalcImportance {
   constructor() {
     super()
   }
 }
 
 test.beforeEach(t => {
-  t.context.termExtract = new TermExtract(new MockImpotance())
+  t.context.termExtract = new TermExtract(new MockImportance())
 })
 
-test('depends on CalcImpotance', t => {
+test('depends on CalcImportance', t => {
   t.throws(TermExtract, TypeError)
 })
 

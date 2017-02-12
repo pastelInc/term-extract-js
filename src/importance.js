@@ -7,7 +7,7 @@ const WEIGHT = Enum('NONE', 'TOTAL', 'UNIQUE', 'PERPLEXITY')
 // How to calculate importance
 const CALC_IMPORTANCE = Enum('NONE', 'FREQUENCY', 'TERM_FREQUENCY')
 
-export class CalcImpotance {
+export class CalcImportance {
   constructor() {
     this.averageRate = 1
     this.frequency = this.getNounFrequency()
@@ -19,12 +19,12 @@ export class CalcImpotance {
   /**
    * @return Map
    */
-  impotance(sentence) {
+  importance(sentence) {
     if (typeof sentence !== 'string') {
       throw new TypeError(`Must be an instance of String`)
     }
 
-    const nImp = this.nounImpotance(sentence)
+    const nImp = this.nounImportance(sentence)
 
     return this.nounsImpDesc(nImp)
   }
@@ -76,7 +76,7 @@ export class CalcImpotance {
   /**
    * @return Map
    */
-  nounImpotance(sentence) {
+  nounImportance(sentence) {
     if (typeof sentence !== 'string') {
       throw new TypeError(`Must be an instance of String`)
     }
@@ -85,7 +85,7 @@ export class CalcImpotance {
   }
 }
 
-export class HashImpotance extends CalcImpotance {
+export class HashImportance extends CalcImportance {
   constructor() {
     super()
   }
@@ -142,14 +142,14 @@ export class HashImpotance extends CalcImpotance {
     let nCont = this.frequency.nounFrequency(sentence)
 
     if (this.calcImp === CALC_IMPORTANCE.TERM_FREQUENCY) {
-      const hashTFImpotance = new HashTFImpotance()
+      const hashTFImportance = new HashTFImportance()
 
-      nCont = hashTFImpotance.nounImpotance(sentence)
+      nCont = hashTFImportance.nounImportance(sentence)
     }
     return nCont
   }
 
-  nounImpotance(sentence) {
+  nounImportance(sentence) {
     const cmpNounFrq = this.nounFrequency(sentence)
     const stat = this.contiguousStatistics(sentence)
     const nImp = new Map()
@@ -186,13 +186,13 @@ export class HashImpotance extends CalcImpotance {
   }
 }
 
-export class HashPerplexityImpotance extends CalcImpotance {
+export class HashPerplexityImportance extends CalcImportance {
   constructor() {
     super()
   }
 }
 
-export class HashFrqImpotance extends CalcImpotance {
+export class HashFrqImportance extends CalcImportance {
   constructor() {
     super()
   }
@@ -210,7 +210,7 @@ export class HashFrqImpotance extends CalcImpotance {
   }
 }
 
-export class HashTFImpotance extends CalcImpotance {
+export class HashTFImportance extends CalcImportance {
   constructor() {
     super()
   }
@@ -233,7 +233,7 @@ export class HashTFImpotance extends CalcImpotance {
     return termFrqData
   }
 
-  nounImpotance(sentence) {
+  nounImportance(sentence) {
     const termFrqData = this.termFrequency(sentence)
     const nImp = this.frequency.nounFrequency(sentence)
     const maxNumOfSimpleNouns = Math.max.apply(null, [...termFrqData.keys()])
