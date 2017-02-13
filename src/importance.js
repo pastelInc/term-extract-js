@@ -139,14 +139,14 @@ export class HashImportance extends CalcImportance {
   }
 
   nounFrequency(sentence) {
-    let nCont = this.frequency.nounFrequency(sentence)
+    let cmpNounFrq = this.frequency.nounFrequency(sentence)
 
     if (this.calcImp === CALC_IMPORTANCE.TERM_FREQUENCY) {
       const hashTFImportance = new HashTFImportance()
 
-      nCont = hashTFImportance.nounImportance(sentence)
+      cmpNounFrq = hashTFImportance.nounTermFrequency(sentence)
     }
-    return nCont
+    return cmpNounFrq
   }
 
   nounImportance(sentence) {
@@ -190,6 +190,108 @@ export class HashPerplexityImportance extends CalcImportance {
   constructor() {
     super()
   }
+
+  nounFrequency(sentence) {
+    let cmpNounFrq = this.frequency.nounFrequency(sentence)
+
+    if (this.calcImp === CALC_IMPORTANCE.TERM_FREQUENCY) {
+      const hashTFImportance = new HashTFImportance()
+
+      cmpNounFrq = hashTFImportance.nounTermFrequency(sentence)
+    }
+    return cmpNounFrq
+  }
+
+  statistics(sentence) {
+    const cmpNounFrq = this.nounFrequency(sentence)
+    const statPerplexity = new Map()
+
+    for (let [cmpNoun, frequency] of cmpNounFrq) {
+      if (cmpNoun === '') continue
+      if (cmpNoun.length > MAX_CMP_SIZE) continue
+
+      const nouns = cmpNoun.split(/\s+/).filter(noun => {
+        return ! (this.ignoreWords.includes(noun)) && ! (noun.match(/^[\d\.\,]+$/))
+      })
+
+      if (! (nouns.length > 1)) continue
+
+      const stat = new Map()
+      const pre = new Map()
+      const post = new Map()
+
+      // initialize
+      for (let noun of nouns) {
+        stat.set(noun, [0, 0])
+      }
+      for (let i = 0; i < nouns.length - 1; i++) {
+        pre.set(nouns[i + 1], new Map([
+          [nouns[i], 0]
+        ]))
+        post.set(nouns[i], new Map([
+          [nouns[i + 1], 0]
+        ]))
+      }
+
+      for (let i = 0; i < nouns.length - 1; i++) {
+        stat.get(nouns[i])[0] += frequency
+        stat.get(nouns[i + 1])[1] += frequency
+        pre.get(nouns[i + 1]).set(nouns[i], pre.get(nouns[i + 1]).get(nouns[i]) + 1)
+        post.get(nouns[i]).set(nouns[i + 1], post.get(nouns[i]).get(nouns[i + 1]) + 1)
+      }
+      for (let [noun, value] of stat) {
+        let h = 0
+
+        if (value[0]) {
+          for (let v of post.get(noun).values()) {
+            let work = v / (value[0] + 1)
+            h -= work * Math.log(work)
+          }
+        }
+        if (value[1]) {
+          for (let v of pre.get(noun).values()) {
+            let work = v / (value[1] + 1)
+            h -= work * Math.log(work)
+          }
+        }
+        statPerplexity.set(noun, h)
+      }
+    }
+    return statPerplexity
+  }
+
+  nounImportance(sentence) {
+    const cmpNounFrq = this.frequency.nounFrequency(sentence)
+    const statPerplexity = this.statistics(sentence)
+    let imp = 0
+    let count = 0
+    const nImp = new Map()
+
+    for (let cmpNoun of cmpNounFrq.keys()) {
+      if (cmpNoun === '') continue
+      if (cmpNoun.length > MAX_CMP_SIZE) continue
+
+      for (let noun of cmpNoun.split(/\s+/)) {
+        if (this.ignoreWords.includes(noun)) continue
+        if (noun.match(/^[\d\.\,]+$/)) continue
+        if (statPerplexity.has(noun)) {
+          imp += statPerplexity.get(noun)
+        }
+        count++
+      }
+      if (count === 0) count = 1
+      imp = imp / (2 * this.averageRate * count)
+      if (this.calcImp !== CALC_IMPORTANCE.NONE) {
+        imp += Math.log(cmpNounFrq.get(cmpNoun) + 1)
+      }
+      imp = imp / Math.log(2)
+      nImp.set(cmpNoun, imp)
+      count = 0
+      imp = 0
+    }
+
+    return nImp
+  }
 }
 
 export class HashFrqImportance extends CalcImportance {
@@ -215,7 +317,7 @@ export class HashTFImportance extends CalcImportance {
     super()
   }
 
-  termFrequency(sentence) {
+  termFrqData(sentence) {
     const termFrqData = new Map()
     const cmpNounFrq = this.frequency.nounFrequency(sentence)
 
@@ -233,8 +335,8 @@ export class HashTFImportance extends CalcImportance {
     return termFrqData
   }
 
-  nounImportance(sentence) {
-    const termFrqData = this.termFrequency(sentence)
+  nounTermFrequency(sentence) {
+    const termFrqData = this.termFrqData(sentence)
     const nImp = this.frequency.nounFrequency(sentence)
     const maxNumOfSimpleNouns = Math.max.apply(null, [...termFrqData.keys()])
 
@@ -267,5 +369,9 @@ export class HashTFImportance extends CalcImportance {
       }
     }
     return nImp
+  }
+
+  nounImportance(sentence) {
+    return this.nounTermFrequency(sentence)
   }
 }
