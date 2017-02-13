@@ -11,8 +11,12 @@ class MeCabFrequency {
   }
 
   nounFrequency(sentence) {
+    if (typeof sentence !== 'string') {
+      throw new TypeError(`Must be an instance of String`)
+    }
+
     const lines = this.parse(sentence)
-    let cmpNounList = new Map()
+    let cmpNounFrq = new Map()
     let terms = []
     let must = false
 
@@ -59,10 +63,10 @@ class MeCabFrequency {
         }
         const key = terms.join(' ')
 
-        if (cmpNounList.has(key)) {
-          cmpNounList.set(key, cmpNounList.get(key) + 1)
+        if (cmpNounFrq.has(key)) {
+          cmpNounFrq.set(key, cmpNounFrq.get(key) + 1)
         } else {
-          cmpNounList.set(key, 1)
+          cmpNounFrq.set(key, 1)
         }
         terms = []
       }
@@ -71,7 +75,7 @@ class MeCabFrequency {
       }
       must = false
     }
-    return cmpNounList
+    return cmpNounFrq
   }
 
   parse(sentence) {
@@ -100,7 +104,7 @@ class MeCabFrequency {
     return (partOfSpeech === '動詞')
   }
 
-  compoundNoun(terms, cmpNounList, must) {
+  compoundNoun(terms, cmpNounFrq, must) {
     if (! terms[0]) {
       return
     }
@@ -117,7 +121,7 @@ class MeCabFrequency {
     }
     const cmpNoun = terms.join(' ')
 
-    cmpNounList[cmpNoun]++
+    cmpNounFrq[cmpNoun]++
     terms = []
   }
 }
