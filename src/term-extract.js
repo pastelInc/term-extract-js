@@ -11,9 +11,13 @@ class TermExtract {
 
   /**
    * Calicurate LR of word.
-   * @return Object
+   * @return Map
    */
   getImpWord(sentence = '') {
+    if (typeof sentence !== 'string') {
+      throw new TypeError(`Must be an instance of String`)
+    }
+
     if (sentence === '') {
       return []
     }

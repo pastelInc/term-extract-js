@@ -1,4 +1,13 @@
-import TermExtract from './term-extract'
-import { CalcImpotance, HashImpotance, HashFreqImpotance, HashPerplexityImpotance, HashTFImpotance } from './impotance'
+// LICENSE : MIT
+'use strict'
 
-export { TermExtract, CalcImpotance, HashImpotance, HashFreqImpotance, HashPerplexityImpotance, HashTFImpotance }
+import TermExtract from './term-extract'
+import { HashImportance, HashFrqImportance, HashPerplexityImportance, HashTFImportance } from './importance'
+
+module.exports = {
+  TermExtract,
+  HashImportance,
+  HashPerplexityImportance,
+  HashFrqImportance,
+  HashTFImportance
+}
