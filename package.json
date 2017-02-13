@@ -15,6 +15,9 @@
   "author": "pastelInc",
   "license": "MIT",
   "ava": {
+    "files": [
+      "test/*-test.js"
+    ],
     "require": "babel-register",
     "babel": "inherit"
   },
