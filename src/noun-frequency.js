@@ -1,16 +1,24 @@
 import MeCab from 'mecab-async'
 
-// use Docker
-MeCab.command = 'docker run -i -a STDIN -a STDOUT --rm tsutomu7/mecab'
-
-const meCab = new MeCab()
-
-class MeCabFrequency {
+export class NounFrequency {
   constructor() {
     this.agglutinativeLang = true
   }
 
-  nounFrequency(sentence) {
+  // implemented as abstract function
+  nounFrequency(sentence = '') {
+    if (typeof sentence !== 'string') {
+      throw new TypeError(`Must be an instance of String`)
+    }
+  }
+}
+
+export class MeCabFrequency extends NounFrequency {
+  constructor() {
+    super()
+  }
+
+  nounFrequency(sentence = '') {
     if (typeof sentence !== 'string') {
       throw new TypeError(`Must be an instance of String`)
     }
@@ -45,14 +53,15 @@ class MeCabFrequency {
         terms = []
       }
       else {
-        if (must || ! terms[0]) {
-          terms = []
-          must = false
-          continue
-        }
+        if (must) continue
         if (terms.length > 1 && terms[0] === '本') {
           terms.shift()
         }
+        if (! terms[0]) {
+          terms = []
+          continue
+        }
+
         const end = terms[terms.length - 1]
 
         if (end === 'など' || end === 'ら' || end === '上'
@@ -61,6 +70,7 @@ class MeCabFrequency {
             || end.match(/^\s+$/) || must) {
           terms.pop()
         }
+
         const key = terms.join(' ')
 
         if (cmpNounFrq.has(key)) {
@@ -78,7 +88,13 @@ class MeCabFrequency {
     return cmpNounFrq
   }
 
-  parse(sentence) {
+  parse(sentence = '') {
+    if (typeof sentence !== 'string') {
+      throw new TypeError(`Must be an instance of String`)
+    }
+
+    const meCab = new MeCab()
+
     return meCab.parseSync(sentence)
   }
 
@@ -125,5 +141,3 @@ class MeCabFrequency {
     terms = []
   }
 }
-
-export default MeCabFrequency
