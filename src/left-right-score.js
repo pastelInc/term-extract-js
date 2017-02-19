@@ -1,12 +1,12 @@
 'use strict'
 
-import { NounFrequency } from './noun-frequency'
+import { NounFrequency, MeCabFrequency } from './noun-frequency'
 
 const MAX_CMP_SIZE = 1024
 
 export class AbstractLeftRightScore {
 
-  constructor(nounFrequency) {
+  constructor(nounFrequency = new MeCabFrequency()) {
     if (! (nounFrequency instanceof NounFrequency)) {
       throw new TypeError(`Must be an instance of NounFrequency`)
     }
@@ -17,6 +17,9 @@ export class AbstractLeftRightScore {
 
   // abstract function
   frequency(noun, sentence) {
+    if (typeof noun !== 'string' || typeof sentence !== 'string') {
+      throw new TypeError(`Must be an instance of String`)
+    }
   }
 }
 
@@ -58,7 +61,7 @@ export class FrequencyLeftRightScore extends AbstractLeftRightScore {
   }
 
   frequency(noun, sentence) {
-    if (typeof noun !== 'string') {
+    if (typeof noun !== 'string' || typeof sentence !== 'string') {
       throw new TypeError(`Must be an instance of String`)
     }
 

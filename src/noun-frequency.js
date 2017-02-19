@@ -13,15 +13,9 @@ export class NounFrequency {
   }
 }
 
-export class MeCabFrequencyAsDocker extends NounFrequency {
-  constructor(image = 'tsutomu7/mecab') {
+export class MeCabFrequency extends NounFrequency {
+  constructor() {
     super()
-    if (typeof image !== 'string') {
-      throw new TypeError(`Must be an instance of String`)
-    }
-
-    // use a Docker
-    MeCab.command = `docker run -i -a STDIN -a STDOUT --rm ${image}`
   }
 
   nounFrequency(sentence = '') {
