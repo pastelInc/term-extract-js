@@ -10,7 +10,7 @@ Please refer to [these papers](http://www.r.dl.itc.u-tokyo.ac.jp/~nakagawa/acade
 
 **MeCab**
 
-Can install from this site.
+For MeCab please visit [this site](http://taku910.github.io/mecab/).
 
 ## Example
 
