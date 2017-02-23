@@ -4,7 +4,7 @@ const https = require('https')
 const parse5 = require('parse5')
 const TermExtract = require('./lib/main.js').TermExtract
 const LRScore = require('./lib/main.js').FrequencyLeftRightScore
-const FrequencyScore = require('./lib/main.js').FrequencyScore
+const FrequencyScore = require('./lib/main.js').TermFrequencyScore
 const MeCab = require('./lib/main.js').MeCabFrequency
 
 process.stdout.on('error', process.exit)
@@ -30,7 +30,7 @@ https.get('https://ja.wikipedia.org/wiki/THE_IDOLM@STER%E3%81%AE%E7%99%BB%E5%A0%
   res.on('end', () => {
     try {
       const document = parse5.parse(rawData)
-      const str = innerText(document.childNodes[1].childNodes[2])
+      const str = innerText(document.childNodes[1])
       const importance = termExtract(str).calculateFLR()
 
       console.log([...importance].join('\n'))

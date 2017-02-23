@@ -30,11 +30,10 @@ class TermExtract {
    */
   calculateFLR() {
     const imp = new Map()
-    const cmpNouns = this.frequency.cmpNouns().keys()
+    const cmpNouns = this.frequency.cmpNouns()
 
-    for (let cmpNoun of cmpNouns) {
+    for (let [cmpNoun, frequencyScore] of cmpNouns) {
       let leftRightScore = this.lr.frequency(cmpNoun)
-      const frequencyScore = this.frequency.frequency(cmpNoun)
 
       if (this.lr.constructor.name === 'PerplexityLeftRightScore') {
         leftRightScore += Math.log(frequencyScore + 1)
