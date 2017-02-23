@@ -1,8 +1,8 @@
 import test from 'ava'
-import { MeCabFrequencyAsDocker } from '../src/noun-frequency'
+import { MeCabFrequency } from '../src/noun-frequency'
 
 test.beforeEach(t => {
-  t.context.meCab = new StubMeCabFrequencyAsDocker()
+  t.context.meCab = new StubMeCabFrequency()
 })
 
 test('single noun should be true', t => {
@@ -10,7 +10,6 @@ test('single noun should be true', t => {
 })
 
 test('should find noun frequency', t => {
-  const sentence = `水瀬伊織（みなせ いおり）は、ゲーム『アイドルマスター』の登場人物で、765プロダクション所属アイドル候補生の一人である。`
   const expected = [
     ['水瀬伊織', 1],
     ['ゲーム', 1],
@@ -18,21 +17,17 @@ test('should find noun frequency', t => {
     ['の登場人物', 1],
     ['765プロダクション 所属 アイドル 候補生', 1]
   ]
-  const nounFrequency = [...t.context.meCab.nounFrequency(sentence)]
+  const nounFrequency = [...t.context.meCab.nounFrequency()]
 
   t.deepEqual(nounFrequency, expected)
 })
 
-class StubMeCabFrequencyAsDocker extends MeCabFrequencyAsDocker {
+class StubMeCabFrequency extends MeCabFrequency {
   constructor() {
-    super()
+    super('')
   }
 
-  parse(sentence = '') {
-    if (typeof sentence !== 'string') {
-      throw new TypeError(`Must be an instance of String`)
-    }
-
+  parseData() {
     return [
       ['水瀬伊織', '名詞', '固有名詞', '一般', '*', '*', '*', '水瀬伊織', 'ミナセイオリ', 'ミナセイオリ'],
       ['（', '記号', '括弧開', '*', '*', '*', '*', '（', '（', '（'],

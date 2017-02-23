@@ -1,12 +1,12 @@
 'use strict'
 
-import { NounFrequency, MeCabFrequency } from './noun-frequency'
+import { NounFrequency } from './noun-frequency'
 
 const MAX_CMP_SIZE = 1024
 
 export class AbstractLeftRightScore {
 
-  constructor(nounFrequency = new MeCabFrequency()) {
+  constructor(nounFrequency) {
     if (! (nounFrequency instanceof NounFrequency)) {
       throw new TypeError(`Must be an instance of NounFrequency`)
     }
@@ -16,8 +16,8 @@ export class AbstractLeftRightScore {
   }
 
   // abstract function
-  frequency(noun, sentence) {
-    if (typeof noun !== 'string' || typeof sentence !== 'string') {
+  frequency(noun) {
+    if (typeof noun !== 'string') {
       throw new TypeError(`Must be an instance of String`)
     }
   }
@@ -29,12 +29,8 @@ export class FrequencyLeftRightScore extends AbstractLeftRightScore {
     super(nounFrequency)
   }
 
-  statistics(sentence) {
-    if (typeof sentence !== 'string') {
-      throw new TypeError(`Must be an instance of String`)
-    }
-
-    const cmpNounFrq = this.nounFrequency.nounFrequency(sentence)
+  statistics() {
+    const cmpNounFrq = this.nounFrequency.nounFrequency()
     const stat = new Map()
 
     for (let [cmpNoun, frequency] of cmpNounFrq) {
@@ -60,8 +56,8 @@ export class FrequencyLeftRightScore extends AbstractLeftRightScore {
     return stat
   }
 
-  frequency(noun, sentence) {
-    if (typeof noun !== 'string' || typeof sentence !== 'string') {
+  frequency(noun) {
+    if (typeof noun !== 'string') {
       throw new TypeError(`Must be an instance of String`)
     }
 
@@ -70,7 +66,7 @@ export class FrequencyLeftRightScore extends AbstractLeftRightScore {
 
     let imp = 1
     let count = 0
-    const stat = this.statistics(sentence)
+    const stat = this.statistics()
 
     for (let n of noun.split(/\s+/)) {
       if (this.ignoreWords.includes(n)) continue
@@ -95,12 +91,8 @@ export class TypeLeftRightScore extends AbstractLeftRightScore {
     super(nounFrequency)
   }
 
-  statistics(sentence) {
-    if (typeof sentence !== 'string') {
-      throw new TypeError(`Must be an instance of String`)
-    }
-
-    const cmpNounFrq = this.nounFrequency.nounFrequency(sentence)
+  statistics() {
+    const cmpNounFrq = this.nounFrequency.nounFrequency()
     const stat = new Map()
     const comb = new Map()
 
@@ -140,15 +132,15 @@ export class TypeLeftRightScore extends AbstractLeftRightScore {
   }
 
 
-  frequency(noun, sentence) {
-    if (typeof noun !== 'string' || typeof sentence !== 'string') {
+  frequency(noun) {
+    if (typeof noun !== 'string') {
       throw new TypeError(`Must be an instance of String`)
     }
 
     if (noun.match(/^\s*$/)) return 1
     if (noun.length > MAX_CMP_SIZE) return 1
 
-    const stat = this.statistics(sentence)
+    const stat = this.statistics()
     let imp = 1
     let count = 0
 
@@ -174,12 +166,8 @@ export class PerplexityLeftRightScore extends AbstractLeftRightScore {
     super(nounFrequency)
   }
 
-  statistics(sentence) {
-    if (typeof sentence !== 'string') {
-      throw new TypeError(`Must be an instance of String`)
-    }
-
-    const cmpNounFrq = this.nounFrequency.nounFrequency(sentence)
+  statistics() {
+    const cmpNounFrq = this.nounFrequency.nounFrequency()
     const stat = new Map()
 
     for (let [cmpNoun, frequency] of cmpNounFrq) {
@@ -206,12 +194,8 @@ export class PerplexityLeftRightScore extends AbstractLeftRightScore {
     return stat
   }
 
-  preStatistics(sentence) {
-    if (typeof sentence !== 'string') {
-      throw new TypeError(`Must be an instance of String`)
-    }
-
-    const cmpNounFrq = this.nounFrequency.nounFrequency(sentence)
+  preStatistics() {
+    const cmpNounFrq = this.nounFrequency.nounFrequency()
     const pre = new Map()
 
     for (let cmpNoun of cmpNounFrq.keys()) {
@@ -241,12 +225,8 @@ export class PerplexityLeftRightScore extends AbstractLeftRightScore {
     return pre
   }
 
-  postStatistics(sentence) {
-    if (typeof sentence !== 'string') {
-      throw new TypeError(`Must be an instance of String`)
-    }
-
-    const cmpNounFrq = this.nounFrequency.nounFrequency(sentence)
+  postStatistics() {
+    const cmpNounFrq = this.nounFrequency.nounFrequency()
     const post = new Map()
 
     for (let cmpNoun of cmpNounFrq.keys()) {
@@ -276,15 +256,11 @@ export class PerplexityLeftRightScore extends AbstractLeftRightScore {
     return post
   }
 
-  statPerplexity(sentence) {
-    if (typeof sentence !== 'string') {
-      throw new TypeError(`Must be an instance of String`)
-    }
-
+  statPerplexity() {
     const statPerplexity = new Map()
-    const stat = this.statistics(sentence)
-    const pre = this.preStatistics(sentence)
-    const post = this.postStatistics(sentence)
+    const stat = this.statistics()
+    const pre = this.preStatistics()
+    const post = this.postStatistics()
 
     for (let cn of stat.keys()) {
       let h = 0
@@ -306,8 +282,8 @@ export class PerplexityLeftRightScore extends AbstractLeftRightScore {
     return statPerplexity
   }
 
-  frequency(noun, sentence) {
-    if (typeof noun !== 'string' || typeof sentence !== 'string') {
+  frequency(noun) {
+    if (typeof noun !== 'string') {
       throw new TypeError(`Must be an instance of String`)
     }
 
@@ -316,7 +292,7 @@ export class PerplexityLeftRightScore extends AbstractLeftRightScore {
 
     let imp = 0
     let count = 0
-    const statPerplexity = this.statPerplexity(sentence)
+    const statPerplexity = this.statPerplexity()
 
     for (let n of noun.split(/\s+/)) {
       if (this.ignoreWords.includes(n)) continue

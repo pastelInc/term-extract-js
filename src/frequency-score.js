@@ -1,24 +1,32 @@
 'use strict'
 
-import { NounFrequency, MeCabFrequency } from './noun-frequency'
+import { NounFrequency } from './noun-frequency'
 
 const MAX_CMP_SIZE = 1024
 
 export class AbstractFrequencyScore {
 
-  constructor(nounFrequency = new MeCabFrequency()) {
+  constructor(nounFrequency) {
     if (! (nounFrequency instanceof NounFrequency)) {
       throw new TypeError(`Must be an instance of NounFrequency`)
     }
     this.nounFrequency = nounFrequency
   }
 
-  cmpNounFrq(sentence) {
-    return this.nounFrequency.nounFrequency(sentence)
+  cmpNounFrq() {
+    return this.nounFrequency.nounFrequency()
   }
 
-  frequency(noun, sentence) {
-    return this.nounFrequency.nounFrequency(sentence).get(noun) || 0
+  cmpNouns() {
+    return this.cmpNounFrq()
+  }
+
+  frequency(noun) {
+    if (typeof noun !== 'string') {
+      throw new TypeError(`Must be an instance of String`)
+    }
+
+    return this.cmpNounFrq().get(noun) || 0
   }
 }
 
@@ -35,9 +43,9 @@ export class TermFrequencyScore extends AbstractFrequencyScore {
     super(nounFrequency)
   }
 
-  termFrqData(sentence) {
+  termFrqData() {
     const termFrqData = new Map()
-    const cmpNounFrq = this.nounFrequency.nounFrequency(sentence)
+    const cmpNounFrq = this.nounFrequency.nounFrequency()
 
     for (let cmpNoun of cmpNounFrq.keys()) {
       if (cmpNoun.match(/^\s*$/)) continue
@@ -53,10 +61,10 @@ export class TermFrequencyScore extends AbstractFrequencyScore {
     return termFrqData
   }
 
-  frequency(noun, sentence) {
-    const termFrqData = this.termFrqData(sentence)
-    const nImp = this.nounFrequency.nounFrequency(sentence)
+  cmpNounFrq() {
+    const termFrqData = this.termFrqData()
     const maxNumOfSimpleNouns = Math.max.apply(null, [...termFrqData.keys()])
+    const nImp = this.nounFrequency.nounFrequency()
 
     for (let i = 2; i <= maxNumOfSimpleNouns; i++) {
       if (! termFrqData.has(i - 1)) continue
@@ -86,6 +94,6 @@ export class TermFrequencyScore extends AbstractFrequencyScore {
         }
       }
     }
-    return nImp.get(noun) || 0
+    return nImp
   }
 }

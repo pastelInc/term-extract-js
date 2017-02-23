@@ -5,7 +5,7 @@ import { TypeLeftRightScore } from '../src/left-right-score'
 const sentences = `トライグラム 統計、トライグラム、単語 トライグラム、クラス トライグラム、単語 トライグラム、トライグラム、トライグラム 抽出、単語 トライグラム 統計、トライグラム、文字 トライグラム`
 
 test.beforeEach(t => {
-  t.context.score = new TypeLeftRightScore(new MockFrequency())
+  t.context.score = new TypeLeftRightScore(new MockFrequency(sentences))
 })
 
 test('depends on NounFrequency', t => {
@@ -21,15 +21,15 @@ test('should be adding concatenation type', t => {
     ['抽出', [0, 1]],
     ['文字', [1, 0]]
   ]
-  t.deepEqual(Array.from(t.context.score.statistics(sentences)), expected)
+  t.deepEqual(Array.from(t.context.score.statistics()), expected)
 })
 
 test('cannot find a compound noun', t => {
-  t.is(t.context.score.frequency('', sentences), 1)
+  t.is(t.context.score.frequency(''), 1)
 })
 
 test('find a compound noun', t => {
-  t.is(t.context.score.frequency('トライグラム', sentences), 3.4641016151377544)
-  t.is(t.context.score.frequency('トライグラム 統計', sentences), 2.2133638394006434)
-  t.is(t.context.score.frequency('単語 トライグラム', sentences), 2.2133638394006434)
+  t.is(t.context.score.frequency('トライグラム'), 3.4641016151377544)
+  t.is(t.context.score.frequency('トライグラム 統計'), 2.2133638394006434)
+  t.is(t.context.score.frequency('単語 トライグラム'), 2.2133638394006434)
 })

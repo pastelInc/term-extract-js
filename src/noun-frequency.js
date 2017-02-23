@@ -1,29 +1,25 @@
 import MeCab from 'mecab-async'
 
 export class NounFrequency {
-  constructor() {
-    this.agglutinativeLang = true
+  constructor(sentence = '') {
+    if (typeof sentence !== 'string') {
+      throw new TypeError(`Must be an instance of String`)
+    }
+    this.sentence = sentence
   }
 
   // implemented as abstract function
-  nounFrequency(sentence = '') {
-    if (typeof sentence !== 'string') {
-      throw new TypeError(`Must be an instance of String`)
-    }
-  }
+  nounFrequency() { }
 }
 
 export class MeCabFrequency extends NounFrequency {
-  constructor() {
-    super()
+
+  constructor(sentence) {
+    super(sentence)
   }
 
-  nounFrequency(sentence = '') {
-    if (typeof sentence !== 'string') {
-      throw new TypeError(`Must be an instance of String`)
-    }
-
-    const lines = this.parse(sentence)
+  nounFrequency() {
+    const lines = this.parseData()
     let cmpNounFrq = new Map()
     let terms = []
     let must = false
@@ -88,14 +84,10 @@ export class MeCabFrequency extends NounFrequency {
     return cmpNounFrq
   }
 
-  parse(sentence = '') {
-    if (typeof sentence !== 'string') {
-      throw new TypeError(`Must be an instance of String`)
-    }
-
+  parseData() {
     const meCab = new MeCab()
 
-    return meCab.parseSync(sentence)
+    return meCab.parseSync(this.sentence)
   }
 
   isSingleNoun(noun, partOfSpeech, cl1, cl2) {
@@ -118,26 +110,5 @@ export class MeCabFrequency extends NounFrequency {
 
   isVerb(partOfSpeech) {
     return (partOfSpeech === '動詞')
-  }
-
-  compoundNoun(terms, cmpNounFrq, must) {
-    if (! terms[0]) {
-      return
-    }
-    if (terms.length > 1 && terms[0] === '本') {
-      terms.shift()
-    }
-    const end = terms[terms.length - 1]
-
-    if (end === 'など' || end === 'ら' || end === '上'
-        || end === '内' || end === '型' || end === '間'
-        || end === '中' || end === '毎' || end === '等'
-        || end.match(/^\s+$/) || must) {
-      terms.pop()
-    }
-    const cmpNoun = terms.join(' ')
-
-    cmpNounFrq[cmpNoun]++
-    terms = []
   }
 }

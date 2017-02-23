@@ -8,8 +8,8 @@ const sentences = `トライグラム 統計、トライグラム、単語 ト�
 
 test('should return a score of frequency', t => {
   const termExtract = new TermExtract(
-    new FrequencyLeftRightScore(new MockFrequency()),
-    new FrequencyScore(new MockFrequency())
+    new FrequencyLeftRightScore(new MockFrequency(sentences)),
+    new FrequencyScore(new MockFrequency(sentences))
   )
   const expected = [
     ['トライグラム', 3],
@@ -21,13 +21,13 @@ test('should return a score of frequency', t => {
     ['文字トライグラム', 1]
   ]
 
-  t.deepEqual(Array.from(termExtract.calculateFrequency(sentences)), expected)
+  t.deepEqual(Array.from(termExtract.calculateFrequency()), expected)
 })
 
 test('should return a score of term frequency', t => {
   const termExtract = new TermExtract(
-    new FrequencyLeftRightScore(new MockFrequency()),
-    new TermFrequencyScore(new MockFrequency())
+    new FrequencyLeftRightScore(new MockFrequency(sentences)),
+    new TermFrequencyScore(new MockFrequency(sentences))
   )
   const expected = [
     ['トライグラム', 10],
@@ -39,13 +39,13 @@ test('should return a score of term frequency', t => {
     ['文字トライグラム', 1]
   ]
 
-  t.deepEqual(Array.from(termExtract.calculateFrequency(sentences)), expected)
+  t.deepEqual(Array.from(termExtract.calculateFrequency()), expected)
 })
 
 test('should have calculated LF of frequency and frequency', t => {
   const termExtract = new TermExtract(
-    new FrequencyLeftRightScore(new MockFrequency()),
-    new FrequencyScore(new MockFrequency())
+    new FrequencyLeftRightScore(new MockFrequency(sentences)),
+    new FrequencyScore(new MockFrequency(sentences))
   )
   const expected = [
     ['トライグラム', 14.696938456699067],
@@ -57,13 +57,13 @@ test('should have calculated LF of frequency and frequency', t => {
     ['単語トライグラム統計', 2.5697965868506505]
   ]
 
-  t.deepEqual(Array.from(termExtract.calculateFLR(sentences)), expected)
+  t.deepEqual(Array.from(termExtract.calculateFLR()), expected)
 })
 
 test('should have calculated LF of frequency and term frequency', t => {
   const termExtract = new TermExtract(
-    new FrequencyLeftRightScore(new MockFrequency()),
-    new TermFrequencyScore(new MockFrequency())
+    new FrequencyLeftRightScore(new MockFrequency(sentences)),
+    new TermFrequencyScore(new MockFrequency(sentences))
   )
   const expected = [
     ['トライグラム', 48.98979485566356],
@@ -75,13 +75,13 @@ test('should have calculated LF of frequency and term frequency', t => {
     ['単語トライグラム統計', 2.5697965868506505]
   ]
 
-  t.deepEqual(Array.from(termExtract.calculateFLR(sentences)), expected)
+  t.deepEqual(Array.from(termExtract.calculateFLR()), expected)
 })
 
 test('should have calculated type of frequency and frequency', t => {
   const termExtract = new TermExtract(
-    new TypeLeftRightScore(new MockFrequency()),
-    new FrequencyScore(new MockFrequency())
+    new TypeLeftRightScore(new MockFrequency(sentences)),
+    new FrequencyScore(new MockFrequency(sentences))
   )
   const expected = [
     ['トライグラム', 10.392304845413264],
@@ -93,13 +93,13 @@ test('should have calculated type of frequency and frequency', t => {
     ['単語トライグラム統計', 1.906368585993873]
   ]
 
-  t.deepEqual(Array.from(termExtract.calculateFLR(sentences)), expected)
+  t.deepEqual(Array.from(termExtract.calculateFLR()), expected)
 })
 
 test('should have calculated type of frequency and term frequency', t => {
   const termExtract = new TermExtract(
-    new TypeLeftRightScore(new MockFrequency()),
-    new TermFrequencyScore(new MockFrequency())
+    new TypeLeftRightScore(new MockFrequency(sentences)),
+    new TermFrequencyScore(new MockFrequency(sentences))
   )
   const expected = [
     ['トライグラム', 34.64101615137754],
@@ -111,13 +111,13 @@ test('should have calculated type of frequency and term frequency', t => {
     ['単語トライグラム統計', 1.906368585993873]
   ]
 
-  t.deepEqual(Array.from(termExtract.calculateFLR(sentences)), expected)
+  t.deepEqual(Array.from(termExtract.calculateFLR()), expected)
 })
 
 test('should have calculated perplexity of frequency and frequency', t => {
   const termExtract = new TermExtract(
-    new PerplexityLeftRightScore(new MockFrequency()),
-    new FrequencyScore(new MockFrequency())
+    new PerplexityLeftRightScore(new MockFrequency(sentences)),
+    new FrequencyScore(new MockFrequency(sentences))
   )
   const expected = [
     ['トライグラム', 3.194987500240385],
@@ -129,13 +129,13 @@ test('should have calculated perplexity of frequency and frequency', t => {
     ['単語トライグラム統計', 1.5466583334935902]
   ]
 
-  t.deepEqual(Array.from(termExtract.calculateFLR(sentences)), expected)
+  t.deepEqual(Array.from(termExtract.calculateFLR()), expected)
 })
 
 test('should have calculated perplexity of frequency and term frequency', t => {
   const termExtract = new TermExtract(
-    new PerplexityLeftRightScore(new MockFrequency()),
-    new TermFrequencyScore(new MockFrequency())
+    new PerplexityLeftRightScore(new MockFrequency(sentences)),
+    new TermFrequencyScore(new MockFrequency(sentences))
   )
   const expected = [
     ['トライグラム', 4.654419118877683],
@@ -147,5 +147,5 @@ test('should have calculated perplexity of frequency and term frequency', t => {
     ['単語トライグラム統計', 1.5466583334935902]
   ]
 
-  t.deepEqual(Array.from(termExtract.calculateFLR(sentences)), expected)
+  t.deepEqual(Array.from(termExtract.calculateFLR()), expected)
 })

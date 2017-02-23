@@ -5,7 +5,7 @@ import { PerplexityLeftRightScore } from '../src/left-right-score'
 const sentences = `トライグラム 統計、トライグラム、単語 トライグラム、クラス トライグラム、単語 トライグラム、トライグラム、トライグラム 抽出、単語 トライグラム 統計、トライグラム、文字 トライグラム`
 
 test.beforeEach(t => {
-  t.context.score = new PerplexityLeftRightScore(new MockFrequency())
+  t.context.score = new PerplexityLeftRightScore(new MockFrequency(sentences))
 })
 
 test('depends on NounFrequency', t => {
@@ -21,7 +21,7 @@ test('should be adding concatenation frequency', t => {
     ['抽出', [0, 1]],
     ['文字', [1, 0]]
   ]
-  t.deepEqual(Array.from(t.context.score.statistics(sentences)), expected)
+  t.deepEqual(Array.from(t.context.score.statistics()), expected)
 })
 
 test('should be adding concatenation pre frequency', t => {
@@ -38,7 +38,7 @@ test('should be adding concatenation pre frequency', t => {
       ['文字', 1]
     ]]
   ])
-  const statistics = t.context.score.preStatistics(sentences)
+  const statistics = t.context.score.preStatistics()
 
   t.deepEqual(Array.from(statistics.get('統計')), expected.get('統計'))
   t.deepEqual(Array.from(statistics.get('抽出')), expected.get('抽出'))
@@ -61,7 +61,7 @@ test('should be adding concatenation post frequency', t => {
       ['トライグラム', 2]
     ]]
   ])
-  const statistics = t.context.score.postStatistics(sentences)
+  const statistics = t.context.score.postStatistics()
 
   t.deepEqual(Array.from(statistics.get('文字')), expected.get('文字'))
   t.deepEqual(Array.from(statistics.get('トライグラム')), expected.get('トライグラム'))
@@ -78,14 +78,14 @@ test('should have calculated entropy', t => {
     ['抽出', 0.34657359027997264],
     ['文字', 0.34657359027997264]
   ]
-  t.deepEqual(Array.from(t.context.score.statPerplexity(sentences)), expected)
+  t.deepEqual(Array.from(t.context.score.statPerplexity()), expected)
 })
 
 test('cannot find a compound noun', t => {
-  t.is(t.context.score.frequency('', sentences), 1)
+  t.is(t.context.score.frequency(''), 1)
 })
 
 test('find a compound noun', t => {
-  t.is(t.context.score.frequency('トライグラム', sentences), 0.828302216596)
-  t.is(t.context.score.frequency('文字 トライグラム', sentences), 0.5007945058679931)
+  t.is(t.context.score.frequency('トライグラム'), 0.828302216596)
+  t.is(t.context.score.frequency('文字 トライグラム'), 0.5007945058679931)
 })

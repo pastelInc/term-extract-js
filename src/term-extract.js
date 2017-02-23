@@ -19,42 +19,22 @@ class TermExtract {
   /**
    * @return Map
    */
-  calculateFrequency(sentence = '') {
-    if (typeof sentence !== 'string') {
-      throw new TypeError(`Must be an instance of String`)
-    }
-    if (sentence === '') {
-      return new Map()
-    }
+  calculateFrequency() {
+    const nouns = this.frequency.cmpNouns()
 
-    const imp = new Map()
-    const cmpNounFrq = this.frequency.cmpNounFrq(sentence)
-
-    for (let cmpNoun of cmpNounFrq.keys()) {
-      const frequencyScore = this.frequency.frequency(cmpNoun, sentence)
-
-      imp.set(cmpNoun, frequencyScore)
-    }
-    return this.nounsImpDesc(imp)
+    return this.nounsImpDesc(nouns)
   }
 
   /**
    * @return Map
    */
-  calculateFLR(sentence = '') {
-    if (typeof sentence !== 'string') {
-      throw new TypeError(`Must be an instance of String`)
-    }
-    if (sentence === '') {
-      return new Map()
-    }
-
+  calculateFLR() {
     const imp = new Map()
-    const cmpNounFrq = this.frequency.cmpNounFrq(sentence)
+    const cmpNouns = this.frequency.cmpNouns().keys()
 
-    for (let cmpNoun of cmpNounFrq.keys()) {
-      let leftRightScore = this.lr.frequency(cmpNoun, sentence)
-      const frequencyScore = this.frequency.frequency(cmpNoun, sentence)
+    for (let cmpNoun of cmpNouns) {
+      let leftRightScore = this.lr.frequency(cmpNoun)
+      const frequencyScore = this.frequency.frequency(cmpNoun)
 
       if (this.lr.constructor.name === 'PerplexityLeftRightScore') {
         leftRightScore += Math.log(frequencyScore + 1)
