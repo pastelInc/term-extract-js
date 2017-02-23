@@ -7,6 +7,8 @@ const LRScore = require('./lib/main.js').FrequencyLeftRightScore
 const FrequencyScore = require('./lib/main.js').FrequencyScore
 const MeCab = require('./lib/main.js').MeCabFrequency
 
+process.stdout.on('error', process.exit)
+
 https.get('https://ja.wikipedia.org/wiki/THE_IDOLM@STER%E3%81%AE%E7%99%BB%E5%A0%B4%E4%BA%BA%E7%89%A9', (res) => {
   const statusCode = res.statusCode
 
@@ -29,12 +31,7 @@ https.get('https://ja.wikipedia.org/wiki/THE_IDOLM@STER%E3%81%AE%E7%99%BB%E5%A0%
     try {
       const document = parse5.parse(rawData)
       const str = innerText(document.childNodes[1].childNodes[2])
-      const meCab = new MeCab(str)
-      const termExtract = new TermExtract(
-        new LRScore(meCab),
-        new FrequencyScore(meCab)
-      )
-      const importance = termExtract.calculateFLR()
+      const importance = termExtract(str).calculateFLR()
 
       console.log([...importance].join('\n'))
     } catch (e) {
@@ -58,4 +55,13 @@ function innerText(dom) {
     str += innerText(dom.childNodes[i])
   }
   return str.trim()
+}
+
+function termExtract(str) {
+  const meCab = new MeCab(str)
+
+  return new TermExtract(
+    new LRScore(meCab),
+    new FrequencyScore(meCab)
+  )
 }
