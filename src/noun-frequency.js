@@ -6,10 +6,16 @@ export class NounFrequency {
       throw new TypeError(`Must be an instance of String`)
     }
     this.sentence = sentence
+    this.cmpNounFrq = new Map()
+    this.parseData()
   }
 
   // implemented as abstract function
-  nounFrequency() { }
+  parseData() { }
+
+  nounFrequency() {
+    return this.cmpNounFrq
+  }
 }
 
 export class MeCabFrequency extends NounFrequency {
@@ -18,9 +24,8 @@ export class MeCabFrequency extends NounFrequency {
     super(sentence)
   }
 
-  nounFrequency() {
-    const lines = this.parseData()
-    let cmpNounFrq = new Map()
+  parseData() {
+    const lines = this.parseMeCabData()
     let terms = []
     let must = false
 
@@ -69,10 +74,10 @@ export class MeCabFrequency extends NounFrequency {
 
         const key = terms.join(' ')
 
-        if (cmpNounFrq.has(key)) {
-          cmpNounFrq.set(key, cmpNounFrq.get(key) + 1)
+        if (this.cmpNounFrq.has(key)) {
+          this.cmpNounFrq.set(key, this.cmpNounFrq.get(key) + 1)
         } else {
-          cmpNounFrq.set(key, 1)
+          this.cmpNounFrq.set(key, 1)
         }
         terms = []
       }
@@ -81,10 +86,9 @@ export class MeCabFrequency extends NounFrequency {
       }
       must = false
     }
-    return cmpNounFrq
   }
 
-  parseData() {
+  parseMeCabData() {
     const meCab = new MeCab()
 
     return meCab.parseSync(this.sentence)

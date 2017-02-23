@@ -27,7 +27,7 @@ class StubMeCabFrequency extends MeCabFrequency {
     super('')
   }
 
-  parseData() {
+  parseMeCabData() {
     return [
       ['水瀬伊織', '名詞', '固有名詞', '一般', '*', '*', '*', '水瀬伊織', 'ミナセイオリ', 'ミナセイオリ'],
       ['（', '記号', '括弧開', '*', '*', '*', '*', '（', '（', '（'],
