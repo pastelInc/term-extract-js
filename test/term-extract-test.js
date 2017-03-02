@@ -3,8 +3,7 @@ import TermExtract from '../src/term-extract'
 import { FrequencyLeftRightScore, TypeLeftRightScore, PerplexityLeftRightScore } from '../src/left-right-score'
 import { FrequencyScore, TermFrequencyScore } from '../src/frequency-score'
 import MockFrequency from './mock-frequency'
-
-const sentences = `トライグラム 統計、トライグラム、単語 トライグラム、クラス トライグラム、単語 トライグラム、トライグラム、トライグラム 抽出、単語 トライグラム 統計、トライグラム、文字 トライグラム`
+import { sentences } from './sentences'
 
 test('should return a score of frequency', t => {
   const termExtract = new TermExtract(

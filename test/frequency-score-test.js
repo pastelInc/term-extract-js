@@ -1,8 +1,7 @@
 import test from 'ava'
 import MockFrequency from './mock-frequency'
 import { FrequencyScore } from '../src/frequency-score'
-
-const sentences = `トライグラム 統計、トライグラム、単語 トライグラム、クラス トライグラム、単語 トライグラム、トライグラム、トライグラム 抽出、単語 トライグラム 統計、トライグラム、文字 トライグラム`
+import { sentences } from './sentences'
 
 test.beforeEach(t => {
   t.context.score = new FrequencyScore(new MockFrequency(sentences))
