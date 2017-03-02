@@ -1,8 +1,7 @@
 'use strict'
 
 import { NounFrequency } from './noun-frequency'
-
-const MAX_CMP_SIZE = 1024
+import { MAX_CMP_SIZE } from './constants'
 
 export class AbstractFrequencyScore {
 

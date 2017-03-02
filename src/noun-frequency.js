@@ -1,4 +1,7 @@
+'use strict'
+
 import MeCab from 'mecab-async'
+import { COMPOUND_NOUN_SEPARATOR } from './constants'
 
 export class NounFrequency {
 
@@ -75,7 +78,7 @@ export class MeCabFrequency extends NounFrequency {
           terms.pop()
         }
 
-        const key = terms.join(' ')
+        const key = terms.join(COMPOUND_NOUN_SEPARATOR)
 
         if (this.cmpNounFrq.has(key)) {
           this.cmpNounFrq.set(key, this.cmpNounFrq.get(key) + 1)
