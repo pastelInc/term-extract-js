@@ -23,6 +23,7 @@ test('should find noun frequency', t => {
 })
 
 class StubMeCabFrequency extends MeCabFrequency {
+
   constructor() {
     super('')
   }

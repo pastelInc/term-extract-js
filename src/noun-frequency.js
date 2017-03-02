@@ -1,6 +1,7 @@
 import MeCab from 'mecab-async'
 
 export class NounFrequency {
+
   constructor(sentence = '') {
     if (typeof sentence !== 'string') {
       throw new TypeError(`Must be an instance of String`)
@@ -52,6 +53,8 @@ export class MeCabFrequency extends NounFrequency {
       }
       else if (this.isVerb(partOfSpeech)) {
         terms = []
+        must = false
+        continue
       }
       else {
         if (must) continue
@@ -80,11 +83,8 @@ export class MeCabFrequency extends NounFrequency {
           this.cmpNounFrq.set(key, 1)
         }
         terms = []
+        must = false
       }
-      if (must) {
-        terms = []
-      }
-      must = false
     }
   }
 
