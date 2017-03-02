@@ -1,7 +1,7 @@
 'use strict'
 
 import { NounFrequency } from './noun-frequency'
-import { MAX_CMP_SIZE } from './constants'
+import { MAX_CMP_SIZE, COMPOUND_NOUN_SEPARATOR, COMPOUND_NOUN_SEPARATOR_REGEX } from './constants'
 
 export class AbstractLeftRightScore {
 
@@ -36,7 +36,7 @@ export class FrequencyLeftRightScore extends AbstractLeftRightScore {
       if (cmpNoun === '') continue
       if (cmpNoun.length > MAX_CMP_SIZE) continue
 
-      const nouns = cmpNoun.split(/\s+/).filter(noun => {
+      const nouns = cmpNoun.split(COMPOUND_NOUN_SEPARATOR_REGEX).filter(noun => {
         return ! (this.ignoreWords.includes(noun)) && ! (noun.match(/^[\d\.\,]+$/))
       })
 
@@ -67,7 +67,7 @@ export class FrequencyLeftRightScore extends AbstractLeftRightScore {
     let count = 0
     const stat = this.statistics()
 
-    for (let n of noun.split(/\s+/)) {
+    for (let n of noun.split(COMPOUND_NOUN_SEPARATOR_REGEX)) {
       if (this.ignoreWords.includes(n)) continue
       if (n.match(/^[\d\.\,]+$/)) continue
 
@@ -99,7 +99,7 @@ export class TypeLeftRightScore extends AbstractLeftRightScore {
       if (cmpNoun === '') continue
       if (cmpNoun.length > MAX_CMP_SIZE) continue
 
-      const nouns = cmpNoun.split(/\s+/).filter(noun => {
+      const nouns = cmpNoun.split(COMPOUND_NOUN_SEPARATOR_REGEX).filter(noun => {
         return ! (this.ignoreWords.includes(noun)) && ! (noun.match(/^[\d\.\,]+$/))
       })
 
@@ -111,7 +111,7 @@ export class TypeLeftRightScore extends AbstractLeftRightScore {
         stat.set(noun, [0, 0])
       }
       for (let i = 0; i < nouns.length - 1; i++) {
-        const combKey = `${nouns[i]} ${nouns[i + 1]}`
+        const combKey = `${nouns[i]}${COMPOUND_NOUN_SEPARATOR}${nouns[i + 1]}`
         let firstComb = false
 
         if (comb.has(combKey)) {
@@ -143,7 +143,7 @@ export class TypeLeftRightScore extends AbstractLeftRightScore {
     let imp = 1
     let count = 0
 
-    for (let n of noun.split(/\s+/)) {
+    for (let n of noun.split(COMPOUND_NOUN_SEPARATOR_REGEX)) {
       if (this.ignoreWords.includes(n)) continue
       if (n.match(/^[\d\.\,]+$/)) continue
       const pre = (stat.has(n)) ? stat.get(n)[0] : 0
@@ -173,7 +173,7 @@ export class PerplexityLeftRightScore extends AbstractLeftRightScore {
       if (cmpNoun === '') continue
       if (cmpNoun.length > MAX_CMP_SIZE) continue
 
-      const nouns = cmpNoun.split(/\s+/).filter(noun => {
+      const nouns = cmpNoun.split(COMPOUND_NOUN_SEPARATOR_REGEX).filter(noun => {
         return ! (this.ignoreWords.includes(noun)) && ! (noun.match(/^[\d\.\,]+$/))
       })
 
@@ -201,7 +201,7 @@ export class PerplexityLeftRightScore extends AbstractLeftRightScore {
       if (cmpNoun === '') continue
       if (cmpNoun.length > MAX_CMP_SIZE) continue
 
-      const nouns = cmpNoun.split(/\s+/).filter(noun => {
+      const nouns = cmpNoun.split(COMPOUND_NOUN_SEPARATOR_REGEX).filter(noun => {
         return ! (this.ignoreWords.includes(noun)) && ! (noun.match(/^[\d\.\,]+$/))
       })
 
@@ -232,7 +232,7 @@ export class PerplexityLeftRightScore extends AbstractLeftRightScore {
       if (cmpNoun === '') continue
       if (cmpNoun.length > MAX_CMP_SIZE) continue
 
-      const nouns = cmpNoun.split(/\s+/).filter(noun => {
+      const nouns = cmpNoun.split(COMPOUND_NOUN_SEPARATOR_REGEX).filter(noun => {
         return ! (this.ignoreWords.includes(noun)) && ! (noun.match(/^[\d\.\,]+$/))
       })
 
@@ -293,7 +293,7 @@ export class PerplexityLeftRightScore extends AbstractLeftRightScore {
     let count = 0
     const statPerplexity = this.statPerplexity()
 
-    for (let n of noun.split(/\s+/)) {
+    for (let n of noun.split(COMPOUND_NOUN_SEPARATOR_REGEX)) {
       if (this.ignoreWords.includes(n)) continue
       if (n.match(/^[\d\.\,]+$/)) continue
       if (statPerplexity.has(n)) {

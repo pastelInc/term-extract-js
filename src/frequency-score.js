@@ -1,7 +1,7 @@
 'use strict'
 
 import { NounFrequency } from './noun-frequency'
-import { MAX_CMP_SIZE } from './constants'
+import { MAX_CMP_SIZE, COMPOUND_NOUN_SEPARATOR_REGEX } from './constants'
 
 export class AbstractFrequencyScore {
 
@@ -50,7 +50,7 @@ export class TermFrequencyScore extends AbstractFrequencyScore {
       if (cmpNoun.match(/^\s*$/)) continue
       if (cmpNoun.length > MAX_CMP_SIZE) continue
 
-      const nouns = cmpNoun.split(/\s+/)
+      const nouns = cmpNoun.split(COMPOUND_NOUN_SEPARATOR_REGEX)
 
       if (! termFrqData.has(nouns.length)) {
         termFrqData.set(nouns.length, [])
@@ -68,12 +68,12 @@ export class TermFrequencyScore extends AbstractFrequencyScore {
     for (let i = 2; i <= maxNumOfSimpleNouns; i++) {
       if (! termFrqData.has(i - 1)) continue
       for (let noun1 of termFrqData.get(i - 1)) {
-        const nouns1 = noun1.split(/\s+/)
+        const nouns1 = noun1.split(COMPOUND_NOUN_SEPARATOR_REGEX)
 
         for (let j = i; j <= maxNumOfSimpleNouns; j++) {
           if (! termFrqData.has(j)) continue
           for (let noun2 of termFrqData.get(j)) {
-            const nouns2 = noun2.split(/\s+/)
+            const nouns2 = noun2.split(COMPOUND_NOUN_SEPARATOR_REGEX)
 
             loop:
             for (let x = 0; x < nouns2.length; x++) {

@@ -2,6 +2,7 @@
 
 import { AbstractLeftRightScore } from './left-right-score'
 import { AbstractFrequencyScore } from './frequency-score'
+import { COMPOUND_NOUN_SEPARATOR_REGEX } from './constants'
 
 class TermExtract {
 
@@ -17,7 +18,7 @@ class TermExtract {
   }
 
   /**
-   * @return Map
+   * @return Array
    */
   calculateFrequency() {
     const nouns = this.frequency.cmpNouns()
@@ -26,7 +27,7 @@ class TermExtract {
   }
 
   /**
-   * @return Map
+   * @return Array
    */
   calculateFLR() {
     const imp = new Map()
@@ -46,20 +47,20 @@ class TermExtract {
   }
 
   /**
-   * @return Map
+   * @return Array
    */
   nounsImpDesc(nImp) {
     if (nImp.constructor.name !== 'Map') {
       throw new TypeError(`Must be an instance of Map`)
     }
 
-    const nImpDesc = new Map([...nImp].sort((a, b) => {
-      return -(a[1] - b[1])
-    }).map(line => {
+    const iterable = [...nImp].map(line => {
       return [this.agglutinativeLang(line[0]), line[1]]
-    }))
+    }).sort((a, b) => {
+      return -(a[1] - b[1])
+    })
 
-    return nImpDesc
+    return iterable
   }
 
   /**
@@ -74,7 +75,7 @@ class TermExtract {
     let ascii = false
     let asciiPre = false
 
-    for (let noun of data.split(/\s+/)) {
+    for (let noun of data.split(COMPOUND_NOUN_SEPARATOR_REGEX)) {
       ascii = (noun.match(/^[\x21-\x7E]+$/)) ? true : false
       disp = (ascii && asciiPre) ? `${disp} ${noun}` : `${disp}${noun}`
       asciiPre = ascii

@@ -33,7 +33,7 @@ https.get('https://ja.wikipedia.org/wiki/THE_IDOLM@STER%E3%81%AE%E7%99%BB%E5%A0%
       const str = innerText(document.childNodes[1])
       const importance = termExtract(str).calculateFLR()
 
-      console.log([...importance].join('\n'))
+      console.log(importance.join('\n'))
     } catch (e) {
       console.log(e.message)
     }
