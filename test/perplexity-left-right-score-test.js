@@ -77,7 +77,7 @@ test('should have calculated entropy', t => {
     ['抽出', 0.34657359027997264],
     ['文字', 0.34657359027997264]
   ]
-  t.deepEqual(Array.from(t.context.score.statPerplexity()), expected)
+  t.deepEqual(Array.from(t.context.score.statPerplexity), expected)
 })
 
 test('cannot find a compound noun', t => {

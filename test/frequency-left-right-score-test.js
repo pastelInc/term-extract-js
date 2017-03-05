@@ -20,7 +20,7 @@ test('should be adding concatenation frequency', t => {
     ['抽出', [0, 1]],
     ['文字', [1, 0]]
   ]
-  t.deepEqual(Array.from(t.context.score.statistics()), expected)
+  t.deepEqual(Array.from(t.context.score.stat), expected)
 })
 
 test('cannot find a compound noun', t => {
