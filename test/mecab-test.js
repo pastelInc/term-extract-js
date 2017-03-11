@@ -1,8 +1,8 @@
 import test from 'ava'
-import { MeCabFrequency } from '../src/noun-frequency'
+import MeCab from '../src/analysers/mecab'
 
 test.beforeEach(t => {
-  t.context.meCab = new StubMeCabFrequency()
+  t.context.meCab = new StubMeCab()
 })
 
 test('single noun should be true', t => {
@@ -17,12 +17,12 @@ test('should find noun frequency', t => {
     ['の登場人物', 1],
     ['765プロダクション 所属 アイドル 候補生', 1]
   ]
-  const nounFrequency = [...t.context.meCab.nounFrequency()]
+  const nounFrequency = [...t.context.meCab.extract()]
 
   t.deepEqual(nounFrequency, expected)
 })
 
-class StubMeCabFrequency extends MeCabFrequency {
+class StubMeCab extends MeCab {
 
   constructor() {
     super('')

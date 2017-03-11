@@ -1,14 +1,14 @@
 import test from 'ava'
-import MockFrequency from './mock-frequency'
-import { PerplexityLeftRightScore } from '../src/left-right-score'
+import MockAnalyser from './mock-analyser'
+import PerplexityScorer from '../src/scorers/perplexity-scorer'
 import { sentences } from './sentences'
 
 test.beforeEach(t => {
-  t.context.score = new PerplexityLeftRightScore(new MockFrequency(sentences))
+  t.context.score = new PerplexityScorer(new MockAnalyser(sentences))
 })
 
 test('depends on NounFrequency', t => {
-  t.throws(PerplexityLeftRightScore, TypeError)
+  t.throws(PerplexityScorer, TypeError)
 })
 
 test('should be adding concatenation frequency', t => {
@@ -81,10 +81,10 @@ test('should have calculated entropy', t => {
 })
 
 test('cannot find a compound noun', t => {
-  t.is(t.context.score.frequency(''), 1)
+  t.is(t.context.score.find(''), 1)
 })
 
 test('find a compound noun', t => {
-  t.is(t.context.score.frequency('トライグラム'), 0.828302216596)
-  t.is(t.context.score.frequency('文字 トライグラム'), 0.5007945058679931)
+  t.is(t.context.score.find('トライグラム'), 0.828302216596)
+  t.is(t.context.score.find('文字 トライグラム'), 0.5007945058679931)
 })

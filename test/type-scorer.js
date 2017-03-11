@@ -1,14 +1,14 @@
 import test from 'ava'
-import MockFrequency from './mock-frequency'
-import { TypeLeftRightScore } from '../src/left-right-score'
+import MockAnalyser from './mock-analyser'
+import TypeScorer from '../src/scorers/type-scorer'
 import { sentences } from './sentences'
 
 test.beforeEach(t => {
-  t.context.score = new TypeLeftRightScore(new MockFrequency(sentences))
+  t.context.score = new TypeScorer(new MockAnalyser(sentences))
 })
 
 test('depends on NounFrequency', t => {
-  t.throws(TypeLeftRightScore, TypeError)
+  t.throws(TypeScorer, TypeError)
 })
 
 test('should be adding concatenation type', t => {
@@ -24,11 +24,11 @@ test('should be adding concatenation type', t => {
 })
 
 test('cannot find a compound noun', t => {
-  t.is(t.context.score.frequency(''), 1)
+  t.is(t.context.score.find(''), 1)
 })
 
 test('find a compound noun', t => {
-  t.is(t.context.score.frequency('トライグラム'), 3.4641016151377544)
-  t.is(t.context.score.frequency('トライグラム 統計'), 2.2133638394006434)
-  t.is(t.context.score.frequency('単語 トライグラム'), 2.2133638394006434)
+  t.is(t.context.score.find('トライグラム'), 3.4641016151377544)
+  t.is(t.context.score.find('トライグラム 統計'), 2.2133638394006434)
+  t.is(t.context.score.find('単語 トライグラム'), 2.2133638394006434)
 })
