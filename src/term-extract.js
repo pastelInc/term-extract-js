@@ -1,27 +1,27 @@
 'use strict'
 
-import { AbstractLeftRightScore } from './left-right-score'
-import { AbstractFrequencyScore } from './frequency-score'
 import { COMPOUND_NOUN_SEPARATOR_REGEX } from './constants'
+import AbstractScorer from './scorers/abstract-scorer'
+import AbstractFrequency from './frequencies/abstract-frequency'
 
 class TermExtract {
 
-  constructor(lr, frequency) {
-    if (! (lr instanceof AbstractLeftRightScore)) {
-      throw new TypeError(`Must be an instance of AbstractLeftRightScore`)
+  constructor(frequency, scorer) {
+    if (! (frequency instanceof AbstractFrequency)) {
+      throw new TypeError(`must be an instance of AbstractFrequency`)
     }
-    if (! (frequency instanceof AbstractFrequencyScore)) {
-      throw new TypeError(`Must be an instance of AbstractFrequencyScore`)
+    if (! (scorer instanceof AbstractScorer)) {
+      throw new TypeError(`must be an instance of AbstractScorer`)
     }
-    this.lr = lr
     this.frequency = frequency
+    this.scorer = scorer
   }
 
   /**
    * @return Array
    */
   calculateFrequency() {
-    const nouns = this.frequency.cmpNouns()
+    const nouns = this.frequency.count()
 
     return this.nounsImpDesc(nouns)
   }
@@ -31,16 +31,16 @@ class TermExtract {
    */
   calculateFLR() {
     const imp = new Map()
-    const cmpNouns = this.frequency.cmpNouns()
+    const cmpNounFreq = this.frequency.count()
 
-    for (let [cmpNoun, frequencyScore] of cmpNouns) {
-      let leftRightScore = this.lr.frequency(cmpNoun)
+    for (let [cmpNoun, importance] of cmpNounFreq) {
+      let score = this.scorer.find(cmpNoun)
 
-      if (this.lr.constructor.name === 'PerplexityLeftRightScore') {
-        leftRightScore += Math.log(frequencyScore + 1)
-        imp.set(cmpNoun, leftRightScore / Math.log(2))
+      if (this.scorer.constructor.name === 'PerplexityScorer') {
+        score += Math.log(importance + 1)
+        imp.set(cmpNoun, score / Math.log(2))
       } else {
-        imp.set(cmpNoun, frequencyScore * leftRightScore)
+        imp.set(cmpNoun, importance * score)
       }
     }
     return this.nounsImpDesc(imp)
