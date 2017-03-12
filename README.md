@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/pastelInc/term-extract-js.svg?circle-token=0d31a0b28ac66315cef6e495a8e931011cc8f5f0)](https://circleci.com/gh/pastelInc/term-extract-js)
+
 # TermExtractJS
 
 This is a module for retrieving technical terms from text data.
