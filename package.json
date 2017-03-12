@@ -1,6 +1,6 @@
 {
   "name": "term-extract-js",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "JavaScript implementation of TermExtract",
   "main": "lib/main.js",
   "files": [
