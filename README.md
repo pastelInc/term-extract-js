@@ -1,3 +1,4 @@
+[![npm version](https://badge.fury.io/js/term-extract-js.svg)](https://badge.fury.io/js/term-extract-js)
 [![CircleCI](https://circleci.com/gh/pastelInc/term-extract-js.svg?style=shield&circle-token=0d31a0b28ac66315cef6e495a8e931011cc8f5f0)](https://circleci.com/gh/pastelInc/term-extract-js)
 
 # TermExtractJS
@@ -28,7 +29,7 @@ $ node examples/FLR.js
 単語トライグラム統計,2.5697965868506505
 ```
 
-## Contributing
+## ContributinJavaScript implementation of TermExtractg
 
 1. Fork it!
 2. Create your feature branch: `git checkout -b my-new-feature`
