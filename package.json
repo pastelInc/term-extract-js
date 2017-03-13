@@ -11,9 +11,22 @@
     "watch": "babel src --out-dir lib --watch --source-maps inline",
     "test": "ava"
   },
-  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pastelInc/term-extract-js.git"
+  },
+  "keywords": [
+    "mecab"
+  ],
   "author": "pastelInc",
   "license": "MIT",
+  "engines": {
+    "node": ">=6.10.0 <7.0.0",
+    "npm": ">=3.10.7 <4.0.0"
+  },
+  "bugs": {
+    "url": "https://github.com/pastelInc/term-extract-js/issues"
+  },
   "ava": {
     "files": [
       "test/*-test.js"
