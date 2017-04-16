@@ -41,3 +41,6 @@ lib
 
 # Vagrant
 vagrant/.vagrant
+
+# VSCode
+.vscode
