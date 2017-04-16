@@ -2,7 +2,7 @@
   "name": "term-extract-js",
   "version": "1.0.0",
   "description": "JavaScript implementation of TermExtract",
-  "main": "lib/main.js",
+  "main": "lib/term-extract.js",
   "files": [
     "lib"
   ],

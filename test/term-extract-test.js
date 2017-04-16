@@ -1,4 +1,5 @@
 import test from 'ava'
+import td from 'testdouble'
 import TermExtract from '../src/term-extract'
 import TypeScorer from '../src/scorers/type-scorer'
 import FrequencyScorer from '../src/scorers/frequency-scorer'
@@ -7,12 +8,9 @@ import Frequency from '../src/frequencies/frequency'
 import TermFrequency from '../src/frequencies/term-frequency'
 import MockAnalyser from './mock-analyser'
 import { sentences } from './sentences'
+import Config from '../src/config'
 
 test('should return a frequency', t => {
-  const termExtract = new TermExtract(
-    new Frequency(new MockAnalyser(sentences)),
-    new FrequencyScorer(new MockAnalyser(sentences))
-  )
   const expected = [
     ['トライグラム', 3],
     ['単語トライグラム', 2],
@@ -22,15 +20,17 @@ test('should return a frequency', t => {
     ['単語トライグラム統計', 1],
     ['文字トライグラム', 1]
   ]
+  const FakeConfig = td.constructor(Config)
+  const te = new TermExtract()
 
-  t.deepEqual(termExtract.calculateFrequency(), expected)
+  td.when(FakeConfig.prototype.getFrequency(sentences))
+    .thenReturn(new Frequency(new MockAnalyser(sentences)))
+  te.config = new FakeConfig()
+
+  t.deepEqual(te.calculateFrequency(sentences), expected)
 })
 
 test('should return a term frequency', t => {
-  const termExtract = new TermExtract(
-    new TermFrequency(new MockAnalyser(sentences)),
-    new FrequencyScorer(new MockAnalyser(sentences))
-  )
   const expected = [
     ['トライグラム', 10],
     ['単語トライグラム', 3],
@@ -40,15 +40,17 @@ test('should return a term frequency', t => {
     ['単語トライグラム統計', 1],
     ['文字トライグラム', 1]
   ]
+  const FakeConfig = td.constructor(Config)
+  const te = new TermExtract()
 
-  t.deepEqual(termExtract.calculateFrequency(), expected)
+  td.when(FakeConfig.prototype.getFrequency(sentences))
+    .thenReturn(new TermFrequency(new MockAnalyser(sentences)))
+  te.config = new FakeConfig()
+
+  t.deepEqual(te.calculateFrequency(sentences), expected)
 })
 
 test('should have calculated LF of frequency and frequency', t => {
-  const termExtract = new TermExtract(
-    new Frequency(new MockAnalyser(sentences)),
-    new FrequencyScorer(new MockAnalyser(sentences))
-  )
   const expected = [
     ['トライグラム', 14.696938456699067],
     ['単語トライグラム', 6.260338320293149],
@@ -58,15 +60,19 @@ test('should have calculated LF of frequency and frequency', t => {
     ['文字トライグラム', 2.6321480259049848],
     ['単語トライグラム統計', 2.5697965868506505]
   ]
+  const FakeConfig = td.constructor(Config)
+  const te = new TermExtract()
 
-  t.deepEqual(termExtract.calculateFLR(), expected)
+  td.when(FakeConfig.prototype.getFrequency(sentences))
+    .thenReturn(new Frequency(new MockAnalyser(sentences)))
+  td.when(FakeConfig.prototype.getScorer(sentences))
+    .thenReturn(new FrequencyScorer(new MockAnalyser(sentences)))
+  te.config = new FakeConfig()
+
+  t.deepEqual(te.calculateFLR(sentences), expected)
 })
 
 test('should have calculated LF of frequency and term frequency', t => {
-  const termExtract = new TermExtract(
-    new TermFrequency(new MockAnalyser(sentences)),
-    new FrequencyScorer(new MockAnalyser(sentences))
-  )
   const expected = [
     ['トライグラム', 48.98979485566356],
     ['単語トライグラム', 9.390507480439723],
@@ -76,15 +82,19 @@ test('should have calculated LF of frequency and term frequency', t => {
     ['文字トライグラム', 2.6321480259049848],
     ['単語トライグラム統計', 2.5697965868506505]
   ]
+  const FakeConfig = td.constructor(Config)
+  const te = new TermExtract()
 
-  t.deepEqual(termExtract.calculateFLR(), expected)
+  td.when(FakeConfig.prototype.getFrequency(sentences))
+    .thenReturn(new TermFrequency(new MockAnalyser(sentences)))
+  td.when(FakeConfig.prototype.getScorer(sentences))
+    .thenReturn(new FrequencyScorer(new MockAnalyser(sentences)))
+
+  te.config = new FakeConfig()
+  t.deepEqual(te.calculateFLR(sentences), expected)
 })
 
 test('should have calculated type of frequency and frequency', t => {
-  const termExtract = new TermExtract(
-    new Frequency(new MockAnalyser(sentences)),
-    new TypeScorer(new MockAnalyser(sentences))
-  )
   const expected = [
     ['トライグラム', 10.392304845413264],
     ['単語トライグラム', 4.426727678801287],
@@ -94,15 +104,19 @@ test('should have calculated type of frequency and frequency', t => {
     ['文字トライグラム', 2.2133638394006434],
     ['単語トライグラム統計', 1.906368585993873]
   ]
+  const FakeConfig = td.constructor(Config)
+  const te = new TermExtract()
 
-  t.deepEqual(termExtract.calculateFLR(), expected)
+  td.when(FakeConfig.prototype.getFrequency(sentences))
+    .thenReturn(new Frequency(new MockAnalyser(sentences)))
+  td.when(FakeConfig.prototype.getScorer(sentences))
+    .thenReturn(new TypeScorer(new MockAnalyser(sentences)))
+  te.config = new FakeConfig()
+
+  t.deepEqual(te.calculateFLR(sentences), expected)
 })
 
 test('should have calculated type of frequency and term frequency', t => {
-  const termExtract = new TermExtract(
-    new TermFrequency(new MockAnalyser(sentences)),
-    new TypeScorer(new MockAnalyser(sentences))
-  )
   const expected = [
     ['トライグラム', 34.64101615137754],
     ['単語トライグラム', 6.64009151820193],
@@ -112,15 +126,19 @@ test('should have calculated type of frequency and term frequency', t => {
     ['文字トライグラム', 2.2133638394006434],
     ['単語トライグラム統計', 1.906368585993873]
   ]
+  const FakeConfig = td.constructor(Config)
+  const te = new TermExtract()
 
-  t.deepEqual(Array.from(termExtract.calculateFLR()), expected)
+  td.when(FakeConfig.prototype.getFrequency(sentences))
+    .thenReturn(new TermFrequency(new MockAnalyser(sentences)))
+  td.when(FakeConfig.prototype.getScorer(sentences))
+    .thenReturn(new TypeScorer(new MockAnalyser(sentences)))
+  te.config = new FakeConfig()
+
+  t.deepEqual(Array.from(te.calculateFLR(sentences)), expected)
 })
 
 test('should have calculated perplexity of frequency and frequency', t => {
-  const termExtract = new TermExtract(
-    new Frequency(new MockAnalyser(sentences)),
-    new PerplexityScorer(new MockAnalyser(sentences))
-  )
   const expected = [
     ['トライグラム', 3.194987500240385],
     ['単語トライグラム', 2.3074562508413488],
@@ -130,15 +148,19 @@ test('should have calculated perplexity of frequency and frequency', t => {
     ['トライグラム統計', 1.6949875002403856],
     ['単語トライグラム統計', 1.5466583334935902]
   ]
+  const FakeConfig = td.constructor(Config)
+  const te = new TermExtract()
 
-  t.deepEqual(Array.from(termExtract.calculateFLR()), expected)
+  td.when(FakeConfig.prototype.getFrequency(sentences))
+    .thenReturn(new Frequency(new MockAnalyser(sentences)))
+  td.when(FakeConfig.prototype.getScorer(sentences))
+    .thenReturn(new PerplexityScorer(new MockAnalyser(sentences)))
+  te.config = new FakeConfig()
+
+  t.deepEqual(Array.from(te.calculateFLR(sentences)), expected)
 })
 
 test('should have calculated perplexity of frequency and term frequency', t => {
-  const termExtract = new TermExtract(
-    new TermFrequency(new MockAnalyser(sentences)),
-    new PerplexityScorer(new MockAnalyser(sentences))
-  )
   const expected = [
     ['トライグラム', 4.654419118877683],
     ['単語トライグラム', 2.7224937501201922],
@@ -148,6 +170,14 @@ test('should have calculated perplexity of frequency and term frequency', t => {
     ['文字トライグラム', 1.7224937501201927],
     ['単語トライグラム統計', 1.5466583334935902]
   ]
+  const FakeConfig = td.constructor(Config)
+  const te = new TermExtract()
 
-  t.deepEqual(Array.from(termExtract.calculateFLR()), expected)
+  td.when(FakeConfig.prototype.getFrequency(sentences))
+    .thenReturn(new TermFrequency(new MockAnalyser(sentences)))
+  td.when(FakeConfig.prototype.getScorer(sentences))
+    .thenReturn(new PerplexityScorer(new MockAnalyser(sentences)))
+  te.config = new FakeConfig()
+
+  t.deepEqual(Array.from(te.calculateFLR(sentences)), expected)
 })

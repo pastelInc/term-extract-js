@@ -1,27 +1,21 @@
+// LICENSE : MIT
 'use strict'
 
 import { COMPOUND_NOUN_SEPARATOR_REGEX } from './constants'
-import AbstractScorer from './scorers/abstract-scorer'
-import AbstractFrequency from './frequencies/abstract-frequency'
+import Config from './config'
 
 class TermExtract {
 
-  constructor(frequency, scorer) {
-    if (! (frequency instanceof AbstractFrequency)) {
-      throw new TypeError(`must be an instance of AbstractFrequency`)
-    }
-    if (! (scorer instanceof AbstractScorer)) {
-      throw new TypeError(`must be an instance of AbstractScorer`)
-    }
-    this.frequency = frequency
-    this.scorer = scorer
+  constructor(config = {}) {
+    this.config = new Config(config)
   }
 
   /**
    * @return Array
    */
-  calculateFrequency() {
-    const nouns = this.frequency.count()
+  calculateFrequency(str) {
+    const frequency = this.config.getFrequency(str)
+    const nouns = frequency.count()
 
     return this.nounsImpDesc(nouns)
   }
@@ -29,14 +23,16 @@ class TermExtract {
   /**
    * @return Array
    */
-  calculateFLR() {
+  calculateFLR(str) {
+    const frequency = this.config.getFrequency(str)
+    const scorer = this.config.getScorer(str)
     const imp = new Map()
-    const cmpNounFreq = this.frequency.count()
+    const cmpNounFreq = frequency.count()
 
     for (let [cmpNoun, importance] of cmpNounFreq) {
-      let score = this.scorer.find(cmpNoun)
+      let score = scorer.find(cmpNoun)
 
-      if (this.scorer.constructor.name === 'PerplexityScorer') {
+      if (scorer.constructor.name === 'PerplexityScorer') {
         score += Math.log(importance + 1)
         imp.set(cmpNoun, score / Math.log(2))
       } else {
@@ -84,4 +80,4 @@ class TermExtract {
   }
 }
 
-export default TermExtract
+module.exports = TermExtract
