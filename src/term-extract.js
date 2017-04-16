@@ -6,8 +6,8 @@ import Config from './config'
 
 class TermExtract {
 
-  constructor(config = {}) {
-    this.config = new Config(config)
+  constructor(option = {}) {
+    this.config = new Config(option)
   }
 
   /**
