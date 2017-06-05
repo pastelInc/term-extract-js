@@ -1,2 +1,0 @@
-[playground]
-localhost ansible_connection=local ansible_user=vagrant ansible_become=true

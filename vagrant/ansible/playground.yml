@@ -1,5 +1,0 @@
----
-- hosts: playground
-  roles:
-    - pastelInc.mecab
-    - geerlingguy.nodejs
