@@ -1,6 +1,6 @@
 'use strict'
 
-import MeCabModule from 'mecab-lite'
+import MeCabModule from 'mecab-async'
 import { COMPOUND_NOUN_SEPARATOR } from '../constants'
 import AbstractAnalyser from './abstract-analyser'
 
