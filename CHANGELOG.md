@@ -1,3 +1,10 @@
+<a name="2.0.1-alpha.2"></a>
+# [2.0.1-alpha.2](https://github.com/pastelInc/term-extract-js/compare/2.0.0-alpha...2.0.1-alpha.2) (2017-06-06)
+
+### Bug Fixes
+
+- fix document
+
 <a name="2.0.1-alpha"></a>
 # [2.0.1-alpha](https://github.com/pastelInc/term-extract-js/compare/2.0.0...2.0.1-alpha) (2017-06-06)
 
