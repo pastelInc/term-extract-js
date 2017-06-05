@@ -1,8 +1,0 @@
----
-- name: disable selinux
-  yum:
-    name: libselinux-python
-    state: latest
-
-- selinux:
-    state: disabled
