@@ -17,10 +17,13 @@ For MeCab please visit [this site](http://taku910.github.io/mecab/).
 ## Usage
 
 ```javascript
-const te = require('term-extract')
+const TermExtract = require('term-extract')
+
 const str = 'トライグラム 統計、トライグラム、単語 トライグラム、クラス トライグラム、単語 トライグラム、トライグラム、トライグラム 抽出、単語 トライグラム 統計、トライグラム、文字 トライグラム。'
 
-te.calculateFLR(str);
+const te = new TermExtract()
+
+te.calculateFLR(str)
 // [
 //   ['トライグラム', 14.696938456699067,]
 //   ['単語トライグラム', 6.260338320293149],
