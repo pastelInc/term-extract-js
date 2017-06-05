@@ -21,8 +21,8 @@
   "author": "pastelInc",
   "license": "MIT",
   "engines": {
-    "node": ">=6.10.0 <7.0.0",
-    "npm": ">=3.10.7 <4.0.0"
+    "node": ">=6.10.0",
+    "npm": ">=3.10.7"
   },
   "bugs": {
     "url": "https://github.com/pastelInc/term-extract-js/issues"
