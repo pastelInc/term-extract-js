@@ -44,6 +44,6 @@
     "testdouble": "^2.1.2"
   },
   "dependencies": {
-    "mecab-async": "^0.1.0"
+    "mecab-lite": "0.0.8"
   }
 }
