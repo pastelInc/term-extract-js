@@ -1,3 +1,14 @@
+<a name="2.0.1-alpha"></a>
+# [2.0.1-alpha](https://github.com/pastelInc/term-extract-js/compare/2.0.0...2.0.1-alpha) (2017-06-06)
+
+### Bug Fixes
+
+- fix document
+
+### Features
+
+- add support for node 8.0
+
 <a name="2.0.0"></a>
 # [2.0.0](https://github.com/pastelInc/term-extract-js/compare/1.0.0...2.0.0) (2017-04-16)
 
