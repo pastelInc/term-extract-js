@@ -1,5 +1,0 @@
----
-machine:
-  timezone: Asia/Tokyo
-  node:
-    version: 6.10.0
