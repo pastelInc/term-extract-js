@@ -34,13 +34,12 @@ sinon.stub(MeCabAsync.prototype, 'parse').callsFake((text, callback) => {
 })
 
 test('should find noun frequency', async t => {
-  const expected = [
-    '水瀬伊織',
-    'ゲーム',
-    'アイドルマスター',
-    'の登場人物',
-    '765プロダクション 所属 アイドル 候補生'
-  ]
+  const expected = new Map()
+  expected.set('水瀬伊織', 1)
+  expected.set('ゲーム', 1)
+  expected.set('アイドルマスター', 1)
+  expected.set('の登場人物', 1)
+  expected.set('765プロダクション 所属 アイドル 候補生', 1)
   const data = await meCab('水瀬伊織（みなせ いおり）は、バンダイナムコゲームスのゲーム『アイドルマスター』の登場人物で、765プロダクション所属アイドル候補生の一人である。')
   t.deepEqual(data, expected)
 })

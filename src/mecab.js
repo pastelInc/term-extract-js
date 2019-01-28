@@ -94,6 +94,15 @@ function parse (corpus) {
 }
 
 module.exports = async function (corpus) {
+  const frequency = new Map()
   const data = await parse(corpus)
-  return getCompNounList(data)
+
+  getCompNounList(data).forEach(element => {
+    if (frequency.has(element)) {
+      frequency.set(element, frequency.get(element) + 1)
+    } else {
+      frequency.set(element, 1)
+    }
+  })
+  return frequency
 }
