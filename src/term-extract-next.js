@@ -1,7 +1,13 @@
 const mecab = require('./mecab')
 
+// Constants
+const MAX_CMP_SIZE = 1024
+// const COMPOUND_NOUN_SEPARATOR = ' '
+const COMPOUND_NOUN_SEPARATOR_REGEX = /\s+/
+
 // Expose function
 exports.scoreFrequency = scoreFrequency
+exports.scoreTF = scoreTF
 
 const defaultOption = {
   analyser: mecab,
@@ -30,7 +36,51 @@ async function scoreFrequency (option, corpus) {
   return frequency
 }
 
-function scoreTF (option, corpus) {}
+/**
+ * Score term frequency.
+ * @param option
+ * @param corpus
+ */
+async function scoreTF (option, corpus) {
+  const tfData = new Map()
+  const frequency = await scoreFrequency(option, corpus)
+
+  // Step1: Making data
+  for (let cmpNoun of frequency.keys()) {
+    if (cmpNoun.match(/^\s*$/)) {
+      continue
+    }
+    if (cmpNoun.length > MAX_CMP_SIZE) {
+      continue
+    }
+
+    const nouns = cmpNoun.split(COMPOUND_NOUN_SEPARATOR_REGEX)
+
+    if (!tfData.has(nouns.length)) {
+      tfData.set(nouns.length, [])
+    }
+    tfData.get(nouns.length).push(cmpNoun)
+  }
+
+  // Step2: Calculate
+  const source = new Map([...tfData.entries()].sort())
+  const target = new Map([...source.entries()])
+  const maxOfLength = Math.max.apply(null, [...tfData.keys()])
+  source.delete(maxOfLength)
+  target.delete(0)
+  for (let [srcLen, srcCompNouns] of source) {
+    for (let [targetLen, targetCompNouns] of target) {
+      if (srcLen >= targetLen) continue
+      for (let srcCompNoun of srcCompNouns) {
+        for (let targetCompNoun of targetCompNouns) {
+          if (!targetCompNoun.includes(srcCompNoun)) continue
+          frequency.set(srcCompNoun, frequency.get(srcCompNoun) + frequency.get(targetCompNoun))
+        }
+      }
+    }
+  }
+  return frequency
+}
 
 function scoreLR (option, corpus) {}
 
