@@ -2,27 +2,26 @@ const mecab = require('./mecab')
 
 // Constants
 const MAX_CMP_SIZE = 1024
-// const COMPOUND_NOUN_SEPARATOR = ' '
 const COMPOUND_NOUN_SEPARATOR_REGEX = /\s+/
 
 // Expose function
 exports.scoreFrequency = scoreFrequency
 exports.scoreTF = scoreTF
+exports.scoreLR = scoreLR
 
-const defaultOption = {
+const defaultLROptions = {
   analyser: mecab,
   averageRate: 1,
-  ignoreWords: []
+  ignoreWords: [],
+  takeUnique: false
 }
 
 /**
  * Score frequency.
- * @param option
  * @param corpus
+ * @param analyser
  */
-async function scoreFrequency (option, corpus) {
-  // const { analyser } = Object.assign(defaultOption, option)
-  const { analyser } = mergeDeep(defaultOption, option)
+async function scoreFrequency (corpus, analyser = mecab) {
   const frequency = new Map()
   const nounList = await analyser(corpus)
 
@@ -38,12 +37,12 @@ async function scoreFrequency (option, corpus) {
 
 /**
  * Score term frequency.
- * @param option
  * @param corpus
+ * @param analyser
  */
-async function scoreTF (option, corpus) {
+async function scoreTF (corpus, analyser = mecab) {
   const tfData = new Map()
-  const frequency = await scoreFrequency(option, corpus)
+  const frequency = await scoreFrequency(corpus, analyser)
 
   // Step1: Making data
   for (let cmpNoun of frequency.keys()) {
@@ -82,15 +81,90 @@ async function scoreTF (option, corpus) {
   return frequency
 }
 
-function scoreLR (option, corpus) {}
+function collectStatistics (frequency, ignoreWords, takeUnique) {
+  const stat = new Map()
+  const comb = new Map()
 
-function scoreFLR (option, corpus) {}
+  for (let cmpNoun of frequency.keys()) {
+    if (cmpNoun === '') continue
+    if (cmpNoun.length > MAX_CMP_SIZE) continue
 
-function scoreTFLR (option, corpus) {}
+    const nouns = cmpNoun.split(COMPOUND_NOUN_SEPARATOR_REGEX).filter((noun) => {
+      return !(ignoreWords.includes(noun)) && !(noun.match(/^[\d\.\,]+$/))
+    })
 
-function scorePerplexity (option, corpus) {}
+    if (!(nouns.length > 1)) continue
 
-function scoreTFPP (option, corpus) {}
+    for (let noun of nouns) {
+      if (stat.has(noun)) continue
+      stat.set(noun, [0, 0])
+    }
+
+    if (!takeUnique) {
+      for (let i = 0; i < nouns.length - 1; i++) {
+        stat.get(nouns[i])[0] += frequency.get(cmpNoun)
+        stat.get(nouns[i + 1])[1] += frequency.get(cmpNoun)
+      }
+      continue
+    }
+    for (let i = 0; i < nouns.length - 1; i++) {
+      const combKey = `${nouns[i]} ${nouns[i + 1]}`
+
+      if (comb.has(combKey)) {
+        comb.set(combKey, comb.get(combKey) + frequency.get(cmpNoun))
+        continue
+      }
+      comb.set(combKey, frequency.get(cmpNoun))
+      stat.get(nouns[i])[0] += 1
+      stat.get(nouns[i + 1])[1] += 1
+    }
+  }
+
+  return stat
+}
+
+async function scoreLR (corpus, options = {}) {
+  if (typeof corpus !== 'string') {
+    throw new TypeError(`must be an instance of String`)
+  }
+
+  // const { analyser } = Object.assign(defaultLROptions, options)
+  const { analyser, averageRate, ignoreWords, takeUnique } = mergeDeep(defaultLROptions, options)
+  const frequency = await scoreFrequency(corpus, analyser)
+  const stat = collectStatistics(frequency, ignoreWords, takeUnique)
+  const nounImportance = new Map()
+
+  for (let cmpNoun of frequency.keys()) {
+    let count = 0
+    let importance = 1
+
+    for (let n of cmpNoun.split(COMPOUND_NOUN_SEPARATOR_REGEX)) {
+      if (ignoreWords.includes(n)) continue
+      if (n.match(/^[\d\.\,]+$/)) continue
+
+      const pre = (stat.has(n)) ? stat.get(n)[0] : 0
+      const post = (stat.has(n)) ? stat.get(n)[1] : 0
+
+      count++
+      importance *= (pre + 1) * (post + 1)
+    }
+
+    if (count === 0) count = 1
+
+    importance = Math.pow(importance, (1 / (2 * averageRate * count)))
+    nounImportance.set(cmpNoun, importance)
+  }
+
+  return nounImportance
+}
+
+function scoreFLR (options, corpus) {}
+
+function scoreTFLR (options, corpus) {}
+
+function scorePerplexity (options, corpus) {}
+
+function scoreTFPP (options, corpus) {}
 
 /**
  * Simple object check.
