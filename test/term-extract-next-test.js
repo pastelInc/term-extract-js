@@ -1,6 +1,6 @@
 const test = require('ava')
 const analyser = require('./mock-analyser-next')
-const { scoreFrequency, scoreTF, scoreLR } = require('../src/term-extract-next')
+const { scoreFrequency, scoreTF, scoreLR, scoreFLR } = require('../src/term-extract-next')
 
 const corpus = `トライグラム 統計、トライグラム、単語 トライグラム、クラス トライグラム、単語 トライグラム、トライグラム、トライグラム 抽出、単語 トライグラム 統計、トライグラム、文字 トライグラム`
 
@@ -51,4 +51,19 @@ test('find a compound noun', async t => {
   t.is(map.get('トライグラム'), 4.898979485566356)
   t.is(map.get('トライグラム 統計'), 2.9129506302439405)
   t.is(map.get('単語 トライグラム'), 3.1301691601465746)
+})
+
+test('should have calculated FLR', async t => {
+  const expected = [
+    ['トライグラム', 14.696938456699067],
+    ['単語 トライグラム', 6.260338320293149],
+    ['トライグラム 統計', 2.9129506302439405],
+    ['クラス トライグラム', 2.6321480259049848],
+    ['トライグラム 抽出', 2.6321480259049848],
+    ['文字 トライグラム', 2.6321480259049848],
+    ['単語 トライグラム 統計', 2.5697965868506505]
+  ]
+  const map = await scoreFLR(corpus, { analyser })
+
+  t.deepEqual(Array.from(map).sort(), expected.sort())
 })

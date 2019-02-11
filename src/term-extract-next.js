@@ -8,6 +8,7 @@ const COMPOUND_NOUN_SEPARATOR_REGEX = /\s+/
 exports.scoreFrequency = scoreFrequency
 exports.scoreTF = scoreTF
 exports.scoreLR = scoreLR
+exports.scoreFLR = scoreFLR
 
 const defaultLROptions = {
   analyser: mecab,
@@ -158,13 +159,29 @@ async function scoreLR (corpus, options = {}) {
   return nounImportance
 }
 
-function scoreFLR (options, corpus) {}
+async function scoreFLR (corpus, options = {}) {
+  if (typeof corpus !== 'string') {
+    throw new TypeError(`must be an instance of String`)
+  }
 
-function scoreTFLR (options, corpus) {}
+  // const { analyser } = Object.assign(defaultLROptions, options)
+  const { analyser } = mergeDeep(defaultLROptions, options)
+  const frequency = await scoreFrequency(corpus, analyser)
+  const lr = await scoreLR(corpus, options)
+  const nounImportance = new Map()
 
-function scorePerplexity (options, corpus) {}
+  for (let [cmpNoun, importance] of frequency) {
+    nounImportance.set(cmpNoun, importance * lr.get(cmpNoun))
+  }
 
-function scoreTFPP (options, corpus) {}
+  return nounImportance
+}
+
+function scoreTFLR (corpus, options = {}) {}
+
+function scorePerplexity (corpus, options = {}) {}
+
+function scoreTFPP (corpus, options = {}) {}
 
 /**
  * Simple object check.
