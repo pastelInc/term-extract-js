@@ -9,6 +9,7 @@ exports.scoreFrequency = scoreFrequency
 exports.scoreTF = scoreTF
 exports.scoreLR = scoreLR
 exports.scoreFLR = scoreFLR
+exports.scoreTFLR = scoreTFLR
 
 const defaultLROptions = {
   analyser: mecab,
@@ -177,7 +178,23 @@ async function scoreFLR (corpus, options = {}) {
   return nounImportance
 }
 
-function scoreTFLR (corpus, options = {}) {}
+async function scoreTFLR (corpus, options = {}) {
+  if (typeof corpus !== 'string') {
+    throw new TypeError(`must be an instance of String`)
+  }
+
+  // const { analyser } = Object.assign(defaultLROptions, options)
+  const { analyser } = mergeDeep(defaultLROptions, options)
+  const frequency = await scoreTF(corpus, analyser)
+  const lr = await scoreLR(corpus, options)
+  const nounImportance = new Map()
+
+  for (let [cmpNoun, importance] of frequency) {
+    nounImportance.set(cmpNoun, importance * lr.get(cmpNoun))
+  }
+
+  return nounImportance
+}
 
 function scorePerplexity (corpus, options = {}) {}
 
@@ -204,10 +221,10 @@ function mergeDeep (target, ...sources) {
   if (isObject(target) && isObject(source)) {
     for (const key in source) {
       if (isObject(source[key])) {
-        if (!target[key]) Object.assign(target, { [key]: {} })
+        if (!target[key]) target = Object.assign({}, target, { [key]: {} })
         mergeDeep(target[key], source[key])
       } else {
-        Object.assign(target, { [key]: source[key] })
+        target = Object.assign({}, target, { [key]: source[key] })
       }
     }
   }
