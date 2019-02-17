@@ -7,9 +7,15 @@ const COMPOUND_NOUN_SEPARATOR_REGEX = /\s+/
 // Expose function
 exports.scoreFrequency = scoreFrequency
 exports.scoreTF = scoreTF
+exports.collectStatistics = collectStatistics
 exports.scoreLR = scoreLR
 exports.scoreFLR = scoreFLR
 exports.scoreTFLR = scoreTFLR
+exports.scorePerplexity = scorePerplexity
+exports.collectPreStatistics = collectPreStatistics
+exports.collectPostStatistics = collectPostStatistics
+exports.collectStatPerplexity = collectStatPerplexity
+exports.scoreTFPP = scoreTFPP
 
 const defaultLROptions = {
   analyser: mecab,
@@ -125,12 +131,73 @@ function collectStatistics (frequency, ignoreWords, takeUnique) {
   return stat
 }
 
+function collectPreStatistics (frequency, ignoreWords) {
+  const stat = new Map()
+
+  for (let cmpNoun of frequency.keys()) {
+    if (cmpNoun === '') continue
+    if (cmpNoun.length > MAX_CMP_SIZE) continue
+
+    const nouns = cmpNoun.split(COMPOUND_NOUN_SEPARATOR_REGEX).filter((noun) => {
+      return !(ignoreWords.includes(noun)) && !(noun.match(/^[\d\.\,]+$/))
+    })
+
+    if (!(nouns.length > 1)) continue
+
+    for (let i = 0; i < nouns.length - 1; i++) {
+      const next = nouns[i + 1]
+      if (!stat.has(next)) {
+        stat.set(next, new Map())
+      }
+      if (!stat.get(next).has(nouns[i])) {
+        stat.get(next).set(nouns[i], 0)
+      }
+    }
+
+    for (let i = 0; i < nouns.length - 1; i++) {
+      stat.get(nouns[i + 1]).set(nouns[i], stat.get(nouns[i + 1]).get(nouns[i]) + 1)
+    }
+  }
+
+  return stat
+}
+
+function collectPostStatistics (frequency, ignoreWords) {
+  const stat = new Map()
+
+  for (let cmpNoun of frequency.keys()) {
+    if (cmpNoun === '') continue
+    if (cmpNoun.length > MAX_CMP_SIZE) continue
+
+    const nouns = cmpNoun.split(COMPOUND_NOUN_SEPARATOR_REGEX).filter((noun) => {
+      return !(ignoreWords.includes(noun)) && !(noun.match(/^[\d\.\,]+$/))
+    })
+
+    if (!(nouns.length > 1)) continue
+
+    for (let i = 0; i < nouns.length - 1; i++) {
+      const next = nouns[i]
+      if (!stat.has(next)) {
+        stat.set(next, new Map())
+      }
+      if (!stat.get(next).has(nouns[i + 1])) {
+        stat.get(next).set(nouns[i + 1], 0)
+      }
+    }
+
+    for (let i = 0; i < nouns.length - 1; i++) {
+      stat.get(nouns[i]).set(nouns[i + 1], stat.get(nouns[i]).get(nouns[i + 1]) + 1)
+    }
+  }
+
+  return stat
+}
+
 async function scoreLR (corpus, options = {}) {
   if (typeof corpus !== 'string') {
     throw new TypeError(`must be an instance of String`)
   }
 
-  // const { analyser } = Object.assign(defaultLROptions, options)
   const { analyser, averageRate, ignoreWords, takeUnique } = mergeDeep(defaultLROptions, options)
   const frequency = await scoreFrequency(corpus, analyser)
   const stat = collectStatistics(frequency, ignoreWords, takeUnique)
@@ -196,9 +263,80 @@ async function scoreTFLR (corpus, options = {}) {
   return nounImportance
 }
 
-function scorePerplexity (corpus, options = {}) {}
+function collectStatPerplexity (stat, postStat, preStat) {
+  const statPerplexity = new Map()
 
-function scoreTFPP (corpus, options = {}) {}
+  for (let cn of stat.keys()) {
+    let h = 0
+
+    if (stat.get(cn)[0]) {
+      for (let v of postStat.get(cn).values()) {
+        let work = v / (stat.get(cn)[0] + 1)
+        h -= work * Math.log(work)
+      }
+    }
+    if (stat.get(cn)[1]) {
+      for (let v of preStat.get(cn).values()) {
+        let work = v / (stat.get(cn)[1] + 1)
+        h -= work * Math.log(work)
+      }
+    }
+    statPerplexity.set(cn, h)
+  }
+  return statPerplexity
+}
+
+async function scorePerplexity (corpus, options = {}) {
+  if (typeof corpus !== 'string') {
+    throw new TypeError(`must be an instance of String`)
+  }
+
+  const { analyser, averageRate, ignoreWords } = mergeDeep(defaultLROptions, options)
+  const frequency = await scoreFrequency(corpus, analyser)
+  const stat = collectStatistics(frequency, ignoreWords, false)
+  const preStat = collectPreStatistics(frequency, ignoreWords)
+  const postStat = collectPostStatistics(frequency, ignoreWords)
+  const statPerplexity = collectStatPerplexity(stat, postStat, preStat)
+
+  const nounImportance = new Map()
+
+  for (let cmpNoun of frequency.keys()) {
+    let count = 0
+    let importance = 0
+
+    for (let n of cmpNoun.split(COMPOUND_NOUN_SEPARATOR_REGEX)) {
+      if (ignoreWords.includes(n)) continue
+      if (n.match(/^[\d\.\,]+$/)) continue
+      if (statPerplexity.has(n)) {
+        importance += statPerplexity.get(n)
+      }
+      count++
+    }
+
+    if (count === 0) count = 1
+    importance = importance / (2 * averageRate * count)
+    nounImportance.set(cmpNoun, importance)
+  }
+  return nounImportance
+}
+
+async function scoreTFPP (corpus, options = {}) {
+  if (typeof corpus !== 'string') {
+    throw new TypeError(`must be an instance of String`)
+  }
+
+  const { analyser } = mergeDeep(defaultLROptions, options)
+  const frequency = await scoreTF(corpus, analyser)
+  const pp = await scorePerplexity(corpus, options)
+  const nounImportance = new Map()
+
+  for (let [cmpNoun, importance] of frequency) {
+    const score = pp.get(cmpNoun) + Math.log(importance + 1)
+    nounImportance.set(cmpNoun, score / Math.log(2))
+  }
+
+  return nounImportance
+}
 
 /**
  * Simple object check.
